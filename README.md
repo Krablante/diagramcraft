@@ -16,7 +16,7 @@ Everything runs locally in Node. No headless browser, no network calls, no accou
 
 ```sh
 # from the GitHub release (works today)
-npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.0.tgz
+npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.1.tgz
 
 # from the repository
 npm install -g github:Krablante/diagramcraft

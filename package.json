@@ -1,6 +1,6 @@
 {
   "name": "diagramcraft",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Beautiful, theme-driven diagrams from a JSON spec: SVG, PNG and ASCII. Built for AI agents.",
   "type": "module",
   "license": "MIT",

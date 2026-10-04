@@ -3,6 +3,7 @@
 // @ts-check
 import ELK from "elkjs/lib/elk.bundled.js";
 import { blockHeight, measureText, widestLine, wrapText } from "./text.js";
+import { snapToBorder } from "./shapes.js";
 
 /** @typedef {import("./types.js").Spec} Spec */
 /** @typedef {import("./types.js").Theme} Theme */
@@ -96,6 +97,7 @@ export async function layoutSpec(spec, theme, options = {}) {
       "elk.spacing.nodeNode": String(layout.nodeGap),
       "elk.layered.spacing.nodeNodeBetweenLayers": String(layout.rankGap),
       "elk.spacing.edgeNode": String(layout.edgeGap),
+      "elk.layered.spacing.edgeNodeBetweenLayers": String(Math.max(24, layout.edgeGap)),
       "elk.spacing.edgeEdge": "12",
       "elk.layered.spacing.edgeLabel": String(layout.edgeLabelGap ?? 8),
       "elk.layered.unnecessaryBendpoints": "true",
@@ -179,6 +181,41 @@ export async function layoutSpec(spec, theme, options = {}) {
       return { id: group.id, label: group.label, color: group.color, x, y, w: right - x, h: bottom - y };
     })
     .filter((zone) => zone !== null);
+
+  // Snap edge endpoints to the real shape borders so arrowheads land on the
+  // outline rather than on the rectangular layout box.
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+  for (const edge of edgesOut) {
+    const source = nodeMap.get(edge.from);
+    const target = nodeMap.get(edge.to);
+    if (!source || !target) continue;
+    for (let i = 0; i < edge.paths.length; i++) {
+      const path = edge.paths[i];
+      if (path.length < 2) continue;
+      if (i === 0) {
+        const snapped = snapToBorder(source, theme, path[0], path[1]);
+        if (edge.arrow === "both") {
+          const dx = path[1][0] - snapped[0];
+          const dy = path[1][1] - snapped[1];
+          if (Math.abs(dx) >= Math.abs(dy)) snapped[0] += Math.sign(dx || 1);
+          else snapped[1] += Math.sign(dy || 1);
+        }
+        path[0] = snapped;
+      }
+      if (i === edge.paths.length - 1) {
+        const last = path.length - 1;
+        const snapped = snapToBorder(target, theme, path[last], path[last - 1]);
+        const gap = edge.arrow !== "none" && target.kind !== "junction" ? 1 : 0;
+        if (gap) {
+          const dx = snapped[0] - path[last - 1][0];
+          const dy = snapped[1] - path[last - 1][1];
+          if (Math.abs(dx) >= Math.abs(dy)) snapped[0] -= Math.sign(dx || 1) * gap;
+          else snapped[1] -= Math.sign(dy || 1) * gap;
+        }
+        path[last] = snapped;
+      }
+    }
+  }
 
   // Shift everything so the model starts at (0,0), then measure total bounds.
   let minX = Infinity;
