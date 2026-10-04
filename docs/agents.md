@@ -1,20 +1,23 @@
 # Using Dorpie from an agent
 
-This page is written for AI agents and for people who configure them. Everything here is doable without a GUI, a browser or network access.
+[English](./agents.md) · [Русский](./agents.ru.md) · [Home](../README.md)
+
+This page is written for AI agents and for people who configure them. Everything here works without a GUI, a browser or network access at render time.
 
 ## Setup
 
 ```sh
-# from a GitHub release (until the npm package is published)
-npm install -g https://github.com/Krablante/dorpie/releases/latest/download/dorpie-0.2.0.tgz
-# or from a checkout
+# global install from the release tarball
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+
+# or run straight from a checkout, no install
 node /path/to/dorpie/bin/dorpie.js <command>
 
 dorpie schema             # full JSON Schema of the spec
 dorpie themes             # theme ids and descriptions
 ```
 
-Example specs are in the repository under [`examples/`](../examples) and in the installed package's `examples/` directory.
+Example specs live in [`examples/`](../examples) in the repository and in the installed package's `examples/` directory.
 
 ## The loop
 
@@ -39,14 +42,13 @@ Example specs are in the repository under [`examples/`](../examples) and in the 
 You can create and edit diagrams with the dorpie CLI.
 - A diagram is one JSON spec; it is the editable source. Never edit generated
   SVG/PNG/ASCII files; edit the spec and re-render.
-- Before rendering, check the spec shape with `dorpie schema` and validate
-  with `dorpie validate <file>`. Fix every reported problem.
+- Check the spec shape with `dorpie schema` and validate with
+  `dorpie validate <file>`. Fix every reported problem before rendering.
 - Render with `dorpie render <file> --format svg,png,ascii`.
 - Inspect the PNG yourself (vision) or the ASCII before claiming success.
 - Choose a theme by intent: classic (neutral), paper (warm print), glass
   (modern, translucent), midnight (dark), vivid (colourful), blueprint
-  (technical), mono (black-and-white print). List them with
-  `dorpie themes`.
+  (technical), mono (black-and-white print). List them with `dorpie themes`.
 - Keep labels short; use `note` for detail; use edge labels yes/no on decisions;
   use groups for phases, not decoration.
 ```
@@ -72,6 +74,7 @@ You can create and edit diagrams with the dorpie CLI.
 - Use `direction: "LR"` for pipelines and timelines, `TB` for procedures.
 - Use groups for phases (`Prepare`, `Publish`, `Roll out`) and repeated blocks (`× N`). Groups do not move nodes; they are visual zones.
 - Prefer spec-level `style` overrides for colour tweaks, and a theme file only when you need a reusable visual system.
+- Unknown fields are rejected, and validation names them with a path — a typo fails fast instead of being ignored.
 
 ## Common mistakes
 
@@ -82,8 +85,9 @@ You can create and edit diagrams with the dorpie CLI.
 | edge pointing at a missing node | `edges[1].to: unknown node "shiping"` |
 | self-loop | `edges[0]: self-loops are not supported; add a junction node instead` |
 | label on a junction | `nodes[3].label: junction nodes do not render a label` |
+| typo in a field name | `nodes[0].lable: unknown field "lable"` |
 | long labels | nodes get wide and the layout gets tall; wrap with `\n` or shorten |
-| treating groups as layout containers | nodes may sit outside a zone if the flow spreads; drag the flow with `direction` and node order instead |
+| treating groups as layout containers | nodes may sit outside a zone if the flow spreads; steer the flow with `direction` and node order instead |
 
 ## Programmatic use
 
@@ -98,4 +102,4 @@ const { svg, png, ascii } = await render(spec, {
 });
 ```
 
-`render` never writes files. The CLI only adds IO around it.
+`render` never writes files. The CLI only adds IO around it. The full surface — options, result fields, errors and lower-level exports — is in [api.md](./api.md).

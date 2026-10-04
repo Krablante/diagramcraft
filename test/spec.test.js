@@ -28,23 +28,42 @@ test("collects every problem with paths", () => {
   let error;
   try {
     parseSpec({
+      bogus: true,
       theme: 42,
       direction: "sideways",
+      layout: { nope: 1 },
       nodes: [
-        { id: "a", kind: "nope" },
+        { id: "a", kind: "nope", lable: "typo" },
         { id: "a", label: "dupe" },
         {},
+        { id: "c", accent: "yes" },
       ],
-      edges: [{ from: "a", to: "ghost" }, { from: "a", to: "a" }],
+      edges: [{ from: "a", to: "ghost", colour: "red" }, { from: "a", to: "a" }],
       groups: [{ nodes: ["a", "missing"] }],
-      output: { formats: ["svg", "gif"] },
+      output: { formats: ["svg", "gif"], transparent: "yes" },
     });
   } catch (caught) {
     error = caught;
   }
   assert.ok(error instanceof SpecError);
   const paths = error.issues.map((issue) => issue.path);
-  for (const expected of ["theme", "direction", "nodes[0].kind", "nodes[1].id", "nodes[2].id", "edges[0].to", "edges[1]", "groups[0].nodes[1]", "output.formats"]) {
+  for (const expected of [
+    "bogus",
+    "theme",
+    "direction",
+    "layout.nope",
+    "nodes[0].kind",
+    "nodes[0].lable",
+    "nodes[1].id",
+    "nodes[2].id",
+    "nodes[3].accent",
+    "edges[0].to",
+    "edges[0].colour",
+    "edges[1]",
+    "groups[0].nodes[1]",
+    "output.formats",
+    "output.transparent",
+  ]) {
     assert.ok(paths.includes(expected), `expected issue for ${expected}, got ${paths.join(", ")}`);
   }
 });

@@ -1,6 +1,8 @@
 # Spec reference
 
-A diagram is one JSON object. It is the only file you edit: SVG, PNG and ASCII are always rendered from it. `dorpie schema` prints the machine-readable JSON Schema.
+[English](./spec.md) · [Русский](./spec.ru.md) · [Home](../README.md)
+
+A diagram is one JSON object, and it is the only file you edit: SVG, PNG and ASCII are always rendered from it. `dorpie schema` prints the machine-readable JSON Schema, and `dorpie validate` reports every problem at once before anything is rendered.
 
 ```jsonc
 {
@@ -34,25 +36,29 @@ A diagram is one JSON object. It is the only file you edit: SVG, PNG and ASCII a
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `version` | `1` | `1` | Spec version. |
+| `version` | `1` | `1` | Spec version. Version 1 is the only accepted value. |
 | `title` | string | — | Rendered above the diagram. |
 | `subtitle` | string | — | Second line under the title. |
 | `footer` | string | — | Small line at the bottom of the canvas. |
-| `theme` | string | `classic` | Built-in theme id, or a path ending in `.json` for a custom theme. |
-| `direction` | `TB` \| `LR` \| `RL` \| `BT` | `TB` | Flow direction. Use `LR` for pipelines and timelines. |
-| `layout` | object | theme | Spacing overrides: `nodeGap`, `rankGap`, `edgeGap` (pixels). |
+| `theme` | string | `classic` | Built-in theme id, or a path to a custom theme file. |
+| `direction` | `TB` \| `LR` \| `RL` \| `BT` | `TB` | Flow direction; case-insensitive. Use `LR` for pipelines and timelines. |
+| `layout` | object | theme | Positive spacing overrides in pixels: `nodeGap`, `rankGap`, `edgeGap`. |
 | `style` | object | — | Deep overrides merged over the resolved theme; see [themes.md](./themes.md). |
-| `output` | object | — | Defaults for formats, PNG `scale`, `transparent`, ASCII `charset`. CLI flags win. |
+| `output` | object | — | Defaults for formats, PNG scale, transparency and ASCII charset. CLI flags win. |
 | `nodes` | array | required | At least one node. |
 | `edges` | array | `[]` | Connections between nodes. |
 | `groups` | array | `[]` | Visual zones around groups of nodes. |
+
+A `theme` value that ends in `.json` or contains a path separator (`/` or `\`) is loaded from disk; any other value must be a built-in theme id.
+
+Unknown fields are rejected, and the error path points at the typo (`nodes[0].lable: unknown field "lable"`). The same applies to every nested object below.
 
 ## Nodes
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `id` | string | required | Unique id used by edges and groups. |
-| `label` | string | `id` | Text in the node. `\n` starts a new line; long labels wrap automatically. |
+| `label` | string | `id` | Text in the node. `\n` starts a new line; long labels wrap automatically. Junction nodes must not have a label. |
 | `kind` | node kind | `process` | Shape and semantics, see below. |
 | `note` | string | — | Small muted line under the label. |
 | `accent` | boolean | `false` | Fill the node with the theme accent colour. |
@@ -78,7 +84,7 @@ A diagram is one JSON object. It is the only file you edit: SVG, PNG and ASCII a
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `id` | string | `e0`, `e1`, … | Optional id. |
+| `id` | string | `e0`, `e1`, … | Optional id; must be unique. |
 | `from`, `to` | string | required | Node ids. Self-loops are not supported; use a junction or a retry path. |
 | `label` | string | — | Short text placed next to the edge. Keep it to `yes`/`no`/`retry`. |
 | `kind` | `solid` \| `dashed` \| `dotted` | `solid` | Line style. |
@@ -89,18 +95,25 @@ Edges are routed automatically as orthogonal lines with rounded corners. Paralle
 
 ## Groups
 
-A group is a visual zone drawn behind its member nodes. It does not influence layout — place nodes so the flow makes sense, then draw a zone around a phase, a subsystem or a repeated block.
+A group is a visual zone drawn behind its member nodes. It does not influence layout — place nodes so the flow makes sense, then draw a zone around a phase, a subsystem or a repeated block. A node may belong to one group; listing it twice is an error.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `id` | string | `g0`, … | Optional id. |
+| `id` | string | `g0`, … | Optional id; must be unique. |
 | `label` | string | `id` | Rendered in the left gutter of the zone. |
-| `nodes` | string[] | required | Member node ids; a node may belong to one group. |
+| `nodes` | string[] | required | Member node ids, at least one. |
 | `color` | string | theme | Zone fill override. |
 
 ## Output defaults
 
-`output.formats` lets a spec decide what `dorpie render spec.json` produces:
+`output` lets a spec decide what a plain `dorpie render spec.json` produces. Every value can be overridden by a CLI flag.
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `formats` | array of `svg`, `png`, `ascii` | `["svg"]` | Formatted outputs to write when `--format` is not passed. |
+| `scale` | number | `2` | PNG scale multiplier. |
+| `transparent` | boolean | `false` | Drop the canvas background in PNG and SVG. |
+| `charset` | `unicode` \| `ascii` | `unicode` | Character set for the ASCII output. |
 
 ```json
 { "output": { "formats": ["svg", "ascii"], "charset": "ascii", "transparent": true } }
@@ -132,13 +145,14 @@ Arrays (like gradient stops) are replaced, not merged.
 `dorpie validate` reports every problem at once with a JSON path, for example:
 
 ```
-spec error: 3 problems
+spec error: 4 problems
   nodes[1].id: duplicate node id "build" (first used by nodes[0])
+  nodes[2].lable: unknown field "lable"
   edges[2].to: unknown node "shiping"
   output.formats: unknown format "jpeg"; expected svg, png or ascii
 ```
 
-Exit codes: `0` success, `2` invalid spec or arguments, `1` runtime failure. Use `--json` for machine-readable validation output.
+`dorpie validate spec.json --json` prints a machine-readable `{ "ok": true, ... }` summary for valid specs. Exit codes: `0` success, `2` invalid spec or arguments, `1` runtime failure.
 
 ## Readability tips
 

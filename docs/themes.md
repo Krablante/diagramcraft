@@ -1,14 +1,18 @@
 # Themes and custom themes
 
-A theme is a JSON token set: fonts, colours, node paints, strokes, shadows, edge styles, zone styling, background treatment and spacing defaults. The renderer implements a fixed vocabulary of primitives; themes compose them. That is why themes can look genuinely different without touching code.
+[English](./themes.md) · [Русский](./themes.ru.md) · [Home](../README.md)
 
-Every built-in theme merges over `themes/_base.json`, which holds all defaults. A custom theme only needs to override what it changes.
+A theme is a JSON token set: fonts, colours, node paints, strokes, shadows, edge styles, zone styling, background treatment and spacing defaults. The renderer implements a fixed vocabulary of primitives, and themes compose them. That is why themes can look genuinely different without touching code.
+
+Every built-in theme merges over [`themes/_base.json`](../themes/_base.json), which holds all defaults. A custom theme only needs to override what it changes, but it must define a non-empty `id` and `title`. `dorpie themes classic` prints a full resolved theme if you want to see every token at once.
 
 ```sh
 dorpie themes                 # list ids and descriptions
 dorpie themes paper > my-theme.json
 dorpie render spec.json --theme my-theme.json
 ```
+
+A theme value ending in `.json` or containing `/` is treated as a file path and loaded from disk. Relative paths are resolved against the current working directory, not the spec file.
 
 Per-spec tweaks use `style`, which is deep-merged over the resolved theme:
 
@@ -23,6 +27,8 @@ Per-spec tweaks use `style`, which is deep-merged over the resolved theme:
 }
 ```
 
+Arrays (like gradient stops) are replaced, not merged.
+
 ## Built-in themes
 
 | Id | Intent |
@@ -34,6 +40,8 @@ Per-spec tweaks use `style`, which is deep-merged over the resolved theme:
 | `vivid` | colour-coded shapes on white, strong indigo accent |
 | `blueprint` | engineering drawing; grid paper, monospace, thin technical lines |
 | `mono` | black-and-white print; monospace, square corners, zero colour |
+
+`dorpie themes --json` also returns `description`, `tags`, `title` and `order` for each theme. Metadata never affects rendering except `order`, which sorts the listings.
 
 ## Token reference
 
@@ -79,7 +87,9 @@ One token per role: `title`, `subtitle`, `node`, `note`, `edge`, `zone`, `footer
 | `spacing` | Letter spacing in pixels. |
 | `uppercase` | `zone` only: render the label in uppercase. |
 
-Bundled families: **Inter** (400/500/600), **Source Serif 4** (400/600), **JetBrains Mono** (400/700). Requesting another weight selects the nearest bundled one. PNG output uses these files directly, so rasterised text is identical on every host. SVG output references the family name; viewers without the font fall back to a system font, which is normal for SVG.
+Bundled families: **Inter** (400/500/600), **Source Serif 4** (400/600), **JetBrains Mono** (400/700). Requesting another weight selects the nearest bundled one. Bundled metrics cover Latin, Greek, Cyrillic, common punctuation and arrows, so labels in those scripts measure and wrap correctly.
+
+PNG output rasterises text from the bundled TTF files, so it does not depend on system fonts. SVG output references the family name; a viewer without that font falls back to a system font, which is normal for SVG. If a theme uses a family Dorpie does not bundle, `--system-fonts` lets the PNG renderer look for it on the host, at the cost of host-dependent output.
 
 To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `known` map in `scripts/build-metrics.mjs`, run `npm run metrics`, and reference it from a theme.
 
@@ -167,6 +177,8 @@ A minimal custom theme — everything else comes from the built-in base:
   }
 }
 ```
+
+Save it as `terminal.json` and render with `--theme terminal.json`. Only `id` and `title` are required; `description`, `tags` and `order` are listing metadata with sensible defaults.
 
 Rules of thumb for a cohesive theme:
 

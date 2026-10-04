@@ -14,7 +14,7 @@ export { layoutSpec } from "./layout.js";
 export { renderSvg } from "./svg.js";
 export { renderAscii } from "./ascii.js";
 export { svgToPng, bundledFontFiles } from "./png.js";
-export { getTheme, loadThemeFile, listThemes } from "./themes.js";
+export { getTheme, loadThemeFile, listThemes, ThemeError } from "./themes.js";
 
 /**
  * Render a spec (raw object or JSON string) into the requested formats.

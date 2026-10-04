@@ -1,6 +1,24 @@
 # Changelog
 
+[English](./CHANGELOG.md) · [Русский](./CHANGELOG.ru.md)
+
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
+
+## [0.2.1] - 2026-10-04
+
+### Added
+
+- Bilingual documentation (English + Russian) for the README, spec, themes, CLI, Node API, agent guide, contributing guide and changelog. New [CLI reference](./docs/cli.md) and [Node API reference](./docs/api.md); docs now ship inside the package tarball.
+- `ThemeError` is exported from the package root for code that catches theme loading errors.
+
+### Fixed
+
+- `dorpie render --system-fonts` now reaches the PNG rasteriser instead of being silently ignored.
+- Spec validation rejects unknown fields and non-boolean `accent` / `output.transparent` values, matching the published JSON Schema and failing on typos with a JSON path.
+
+### Changed
+
+- Install instructions point at the versioned release tarball; npm registry publishing is documented as not yet available.
 
 ## [0.2.0] - 2026-10-04
 

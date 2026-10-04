@@ -39,6 +39,28 @@ function isObject(value) {
 }
 
 /**
+ * Report fields the spec does not define, so typos fail with a path instead
+ * of passing silently. Mirrors `additionalProperties: false` in the published
+ * JSON Schema.
+ * @param {Record<string, any>} value
+ * @param {string[]} allowed
+ * @param {string} path
+ * @param {(path:string, message:string) => void} problem
+ */
+function rejectUnknown(value, allowed, path, problem) {
+  for (const key of Object.keys(value)) {
+    if (!allowed.includes(key)) problem(path ? `${path}.${key}` : key, `unknown field ${JSON.stringify(key)}`);
+  }
+}
+
+const SPEC_KEYS = ["version", "title", "subtitle", "footer", "theme", "direction", "layout", "style", "output", "nodes", "edges", "groups"];
+const LAYOUT_KEYS = ["nodeGap", "rankGap", "edgeGap"];
+const OUTPUT_KEYS = ["formats", "scale", "transparent", "charset"];
+const NODE_KEYS = ["id", "label", "kind", "note", "accent", "color", "maxWidth", "width", "height"];
+const EDGE_KEYS = ["id", "from", "to", "label", "kind", "arrow", "color"];
+const GROUP_KEYS = ["id", "label", "nodes", "color"];
+
+/**
  * Parse and validate a raw spec object. Returns a normalized copy.
  * @param {unknown} raw
  * @returns {Spec}
@@ -52,6 +74,7 @@ export function parseSpec(raw) {
     throw new SpecError([{ path: "(root)", message: "spec must be a JSON object" }]);
   }
   const input = /** @type {Record<string, any>} */ (raw);
+  rejectUnknown(input, SPEC_KEYS, "", problem);
 
   if (input.version != null && input.version !== 1) {
     problem("version", `unsupported spec version ${JSON.stringify(input.version)}; expected 1`);
@@ -84,7 +107,8 @@ export function parseSpec(raw) {
   if (input.layout != null) {
     if (!isObject(input.layout)) problem("layout", "must be an object");
     else {
-      for (const key of ["nodeGap", "rankGap", "edgeGap"]) {
+      rejectUnknown(input.layout, LAYOUT_KEYS, "layout", problem);
+      for (const key of LAYOUT_KEYS) {
         const value = input.layout[key];
         if (value === undefined) continue;
         if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) problem(`layout.${key}`, "must be a positive number");
@@ -104,6 +128,7 @@ export function parseSpec(raw) {
   if (input.output != null) {
     if (!isObject(input.output)) problem("output", "must be an object");
     else {
+      rejectUnknown(input.output, OUTPUT_KEYS, "output", problem);
       if (input.output.formats != null) {
         if (!Array.isArray(input.output.formats) || !input.output.formats.length) problem("output.formats", "must be a non-empty array");
         else {
@@ -119,7 +144,10 @@ export function parseSpec(raw) {
         if (typeof input.output.scale !== "number" || !Number.isFinite(input.output.scale) || input.output.scale <= 0) problem("output.scale", "must be a positive number");
         else output.scale = input.output.scale;
       }
-      if (input.output.transparent != null) output.transparent = Boolean(input.output.transparent);
+      if (input.output.transparent != null) {
+        if (typeof input.output.transparent !== "boolean") problem("output.transparent", "must be a boolean");
+        else output.transparent = input.output.transparent;
+      }
       if (input.output.charset != null) {
         if (input.output.charset !== "unicode" && input.output.charset !== "ascii") problem("output.charset", 'must be "unicode" or "ascii"');
         else output.charset = input.output.charset;
@@ -142,6 +170,7 @@ export function parseSpec(raw) {
         problem(path, "must be an object");
         return;
       }
+      rejectUnknown(node, NODE_KEYS, path, problem);
       const id = str(`${path}.id`, node.id);
       if (!id) {
         if (node.id !== undefined) problem(`${path}.id`, "must be a non-empty string");
@@ -166,6 +195,7 @@ export function parseSpec(raw) {
 
       const label = kind === "junction" ? "" : str(`${path}.label`, node.label, id) ?? id;
       const note = str(`${path}.note`, node.note);
+      if (node.accent != null && typeof node.accent !== "boolean") problem(`${path}.accent`, "must be a boolean");
       const accent = node.accent === undefined ? false : Boolean(node.accent);
       const color = str(`${path}.color`, node.color);
 
@@ -206,6 +236,7 @@ export function parseSpec(raw) {
         problem(path, "must be an object");
         return;
       }
+      rejectUnknown(edge, EDGE_KEYS, path, problem);
       const from = str(`${path}.from`, edge.from);
       const to = str(`${path}.to`, edge.to);
       if (!from) problem(`${path}.from`, "missing source node id");
@@ -262,6 +293,7 @@ export function parseSpec(raw) {
         problem(path, "must be an object");
         return;
       }
+      rejectUnknown(group, GROUP_KEYS, path, problem);
       let id = str(`${path}.id`, group.id) ?? `g${index}`;
       if (groupIds.has(id)) {
         problem(`${path}.id`, `duplicate group id ${JSON.stringify(id)}`);

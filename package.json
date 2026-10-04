@@ -1,6 +1,6 @@
 {
   "name": "dorpie",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Beautiful, theme-driven diagrams from a JSON spec: SVG, PNG and ASCII. Built for AI agents.",
   "type": "module",
   "license": "MIT",
@@ -42,9 +42,19 @@
     "schema",
     "examples",
     "docs/spec.md",
+    "docs/spec.ru.md",
     "docs/themes.md",
+    "docs/themes.ru.md",
+    "docs/cli.md",
+    "docs/cli.ru.md",
+    "docs/api.md",
+    "docs/api.ru.md",
     "docs/agents.md",
+    "docs/agents.ru.md",
     "README.md",
+    "README.ru.md",
+    "CHANGELOG.md",
+    "CHANGELOG.ru.md",
     "LICENSE"
   ],
   "scripts": {

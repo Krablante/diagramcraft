@@ -25,6 +25,17 @@ test("render writes requested formats", () => {
   }
 });
 
+test("render accepts --system-fonts for PNG", () => {
+  const dir = mkdtempSync(join(tmpdir(), "dorpie-"));
+  try {
+    const result = run(["render", example, "--format", "png", "--system-fonts", "--out", `${dir}/`]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.ok(existsSync(join(dir, "quickstart.png")));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("render to stdout keeps stdout clean", () => {
   const result = run(["render", example, "--format", "ascii", "--out", "-", "--quiet"]);
   assert.equal(result.status, 0, result.stderr);

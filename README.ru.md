@@ -1,0 +1,151 @@
+<h1 align="center">Dorpie</h1>
+
+<p align="center"><strong>Диаграммы из одного JSON-файла.</strong><br>
+Семь полноценных визуальных тем, три формата вывода, без браузера и GUI.<br>
+Сделано для ИИ-агентов, удобно и людям.</p>
+
+<p align="center">
+  <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
+</p>
+
+<p align="center">
+  <img alt="Схема transformer-блока в теме Glass" src="./docs/gallery/transformer-block.png" width="560">
+</p>
+
+Dorpie — консольная утилита и библиотека для Node: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой.
+
+Всё работает локально в Node: без headless-браузера, без сетевых запросов во время рендера, без аккаунтов. Типичная диаграмма рендерится заметно меньше чем за секунду. Каждая тема — это целостная визуальная система со своей типографикой, формами, линиями, фоном и композицией, а не одна и та же картинка в другой палитре.
+
+## Установка
+
+Нужен Node 20 или новее. Пакет распространяется как tarball во вложениях GitHub-релизов:
+
+```sh
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+dorpie --version
+```
+
+Можно поставить и прямо из репозитория — тогда будет отслеживаться ветка `main`:
+
+```sh
+npm install -g github:Krablante/dorpie
+```
+
+Публикации в npm пока нет, поэтому `npm install -g dorpie` не сработает.
+
+## Быстрый старт
+
+```sh
+dorpie init hello.json      # создаёт стартовую спеку
+dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
+```
+
+`init` запрашивает все три формата, так что рендер кладёт файлы рядом со спекой и печатает их пути. Дальше правьте JSON и рендерите снова:
+
+```jsonc
+{
+  "version": 1,
+  "title": "Деплой",
+  "theme": "paper",
+  "direction": "TB",
+  "output": { "formats": ["svg", "png", "ascii"] },
+  "nodes": [
+    { "id": "start", "kind": "terminal", "label": "Пуш в main" },
+    { "id": "build", "kind": "process", "label": "Сборка и тесты" },
+    { "id": "ok", "kind": "decision", "label": "Зелёный?" },
+    { "id": "ship", "kind": "terminal", "label": "Выкатка" }
+  ],
+  "edges": [
+    { "from": "start", "to": "build" },
+    { "from": "build", "to": "ok" },
+    { "from": "ok", "to": "ship", "label": "да" },
+    { "from": "ok", "to": "build", "label": "нет", "kind": "dashed" }
+  ]
+}
+```
+
+`dorpie validate spec.json` проверяет спеку без рендера и показывает все проблемы с JSON-путями. Флаги CLI перекрывают спеку: `dorpie render spec.json --theme glass --format png --scale 2 --out out/`. Полный справочник команд — в [docs/cli.ru.md](./docs/cli.ru.md).
+
+## Форматы вывода
+
+**SVG** — основной формат: чистый вектор, редактируется в любом векторном редакторе, компактный и резкий. **PNG** растрируется локально встроенными шрифтами под Open Font License через resvg — без браузера, системных шрифтов и сети. **ASCII** раскладывает ту же диаграмму по символьной сетке псевдографикой; его удобно читать в терминале и дешёво сравнивать в диффах, а `--charset ascii` переключает рамки на `+`, `-` и `|`.
+
+`--transparent` убирает фон холста для слайдов и документации, `--scale` задаёт множитель PNG (по умолчанию 2), а `--system-fonts` разрешает запасной вариант из системных шрифтов, если тема использует семейство, которого нет среди встроенных.
+
+## Темы
+
+Каждая тема — это целостная система: шрифты, толщины линий, заливки узлов, стрелки, фон, текстуры и композиция. Выбирайте по задаче:
+
+| | |
+|---|---|
+| ![Classic](./docs/gallery/theme-classic.png) **Classic** — нейтральные блок-схемы, чёткие и привычные | ![Mono](./docs/gallery/theme-mono.png) **Mono** — чёрно-белая печать, моноширинный шрифт |
+| ![Paper](./docs/gallery/theme-paper.png) **Paper** — тёплая печатная страница, антиква, зерно бумаги | ![Glass](./docs/gallery/theme-glass.png) **Glass** — жидкое стекло поверх цветных полей |
+| ![Midnight](./docs/gallery/theme-midnight.png) **Midnight** — тёмно-синий холст, мягкое свечение | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — цветовое кодирование форм, индиго-акцент |
+| ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — инженерная сетка, техничные линии | ![Node shapes](./docs/gallery/node-shapes.png) **Все формы** — terminal, decision, data, document, database, connector, note, junction |
+
+Темы — это данные. Возьмите встроенную тему за основу: `dorpie themes paper > my-theme.json`, меняйте что нужно и рендерите с `--theme my-theme.json`. Небольшие правки можно оставить в спеке:
+
+```json
+{ "theme": "glass", "style": { "fonts": { "title": { "color": "#4338ca" } } } }
+```
+
+Полный справочник токенов и руководство по созданию темы — в [docs/themes.ru.md](./docs/themes.ru.md).
+
+## Для ИИ-агентов
+
+Весь продукт построен вокруг одного цикла:
+
+1. Написать или отредактировать спеку (JSON). Сгенерированные файлы не редактировать.
+2. `dorpie validate spec.json` — структурированные ошибки с путями.
+3. `dorpie render spec.json --format svg,png,ascii`.
+4. Посмотреть на PNG (vision) или ASCII, поправить спеку и отрендерить снова.
+
+В [docs/agents.ru.md](./docs/agents.ru.md) есть готовый системный промпт, советы по выбору темы и типичные ошибки. Если Dorpie нужен из кода, а не из оболочки, используйте программный API:
+
+```js
+import { render } from "dorpie";
+
+const { svg, png, ascii } = await render(spec, {
+  theme: "glass",                 // встроенный id или путь к JSON-файлу темы
+  formats: ["svg", "png", "ascii"],
+});
+```
+
+Полное описание API — в [docs/api.ru.md](./docs/api.ru.md).
+
+## Примеры
+
+- `examples/quickstart.json` — самая маленькая полезная диаграмма
+- `examples/buro-draft-workflow.json` — как изменение попадает в реестр с проверкой ревизий (Paper)
+- `examples/opencodez-release.json` — выпуск от апстрим-тега до проверенных хостов (Vivid, с зонами)
+- `examples/opencodebot-artifact.json` — как файл попадает в Telegram-топик (Blueprint)
+- `examples/transformer-block.json` — residual-блок трансформера со слияниями на junction (Glass)
+- `examples/node-shapes.json` — все виды узлов на одной схеме
+
+## CLI
+
+```
+dorpie render <spec.json|-> [--theme id|file] [--format svg,png,ascii]
+                                 [--out path|->] [--scale n] [--transparent]
+                                 [--system-fonts] [--charset unicode|ascii] [--quiet]
+dorpie validate <spec.json|-> [--json]
+dorpie themes [id] [--json]
+dorpie schema
+dorpie init [file.json] [--force]
+```
+
+По умолчанию рендер пишет файлы рядом со спекой и печатает их пути; `--out -` выводит один формат в stdout. Коды возврата: `0` — успех, `2` — некорректная спека или аргументы, `1` — ошибка времени выполнения. Правила выбора путей и разбор типичных проблем — в [docs/cli.ru.md](./docs/cli.ru.md).
+
+## Документация
+
+- [docs/cli.ru.md](./docs/cli.ru.md) — команды, флаги, коды возврата, типичные проблемы
+- [docs/spec.ru.md](./docs/spec.ru.md) — все поля спеки, виды узлов, значения по умолчанию
+- [docs/themes.ru.md](./docs/themes.ru.md) — токены тем и как написать свою
+- [docs/api.ru.md](./docs/api.ru.md) — Node API для встраивания Dorpie
+- [docs/agents.ru.md](./docs/agents.ru.md) — рабочий цикл агента и системный промпт
+- [CONTRIBUTING.ru.md](./CONTRIBUTING.ru.md) — локальная разработка, архитектура и релизы
+- [CHANGELOG.ru.md](./CHANGELOG.ru.md) — история версий
+
+## Лицензия
+
+MIT. Встроенные шрифты (Inter, Source Serif 4, JetBrains Mono) распространяются по SIL Open Font License; их лицензии лежат в `assets/fonts/LICENSES/`.

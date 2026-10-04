@@ -158,6 +158,7 @@ async function renderCommand(args, values) {
     formats,
     scale,
     transparent: values.transparent,
+    systemFonts: values["system-fonts"],
     charset: values.charset,
   });
 
