@@ -6,7 +6,7 @@ Thanks for taking a look. The project is small on purpose; the fastest way in is
 npm install
 npm run check
 npm run gallery          # renders the README images
-node bin/diagramcraft.js render examples/quickstart.json --format svg,png,ascii
+node bin/dorpie.js render examples/quickstart.json --format svg,png,ascii
 ```
 
 ## Where things go
@@ -19,7 +19,7 @@ node bin/diagramcraft.js render examples/quickstart.json --format svg,png,ascii
 
 ## Adding a theme
 
-1. `diagramcraft themes classic > themes/your-theme.json` (or copy any theme).
+1. `dorpie themes classic > themes/your-theme.json` (or copy any theme).
 2. Set a unique `id`, `title`, `description`, `tags` and `order`.
 3. Change typography, shapes, line work, background and accent — a theme should read as a different visual system, not a recolour.
 4. Render a diagram with a decision, a note, a group and an accent node; inspect the PNG.

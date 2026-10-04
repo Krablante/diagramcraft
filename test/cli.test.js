@@ -7,13 +7,13 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const bin = join(here, "..", "bin", "diagramcraft.js");
+const bin = join(here, "..", "bin", "dorpie.js");
 const example = join(here, "..", "examples", "quickstart.json");
 
 const run = (args) => spawnSync(process.execPath, [bin, ...args], { encoding: "utf8" });
 
 test("render writes requested formats", () => {
-  const dir = mkdtempSync(join(tmpdir(), "diagramcraft-"));
+  const dir = mkdtempSync(join(tmpdir(), "dorpie-"));
   try {
     const result = run(["render", example, "--format", "svg,ascii", "--out", `${dir}/`]);
     assert.equal(result.status, 0, result.stderr);
@@ -40,7 +40,7 @@ test("validate reports structured results", () => {
 });
 
 test("validate exits 2 with readable issues", () => {
-  const dir = mkdtempSync(join(tmpdir(), "diagramcraft-"));
+  const dir = mkdtempSync(join(tmpdir(), "dorpie-"));
   try {
     const file = join(dir, "bad.json");
     writeFileSync(file, JSON.stringify({ nodes: [{ id: "a" }], edges: [{ from: "a", to: "ghost" }] }));
@@ -66,7 +66,7 @@ test("themes lists built-ins and prints one theme", () => {
 });
 
 test("init writes a starter spec", () => {
-  const dir = mkdtempSync(join(tmpdir(), "diagramcraft-"));
+  const dir = mkdtempSync(join(tmpdir(), "dorpie-"));
   try {
     const file = join(dir, "diagram.json");
     const result = run(["init", file]);
@@ -84,7 +84,7 @@ test("init writes a starter spec", () => {
 
 test("version and help work", () => {
   assert.match(run(["--version"]).stdout, /^\d+\.\d+\.\d+/);
-  assert.match(run(["--help"]).stdout, /diagramcraft render/);
+  assert.match(run(["--help"]).stdout, /dorpie render/);
   assert.equal(run(["nonsense"]).status, 2);
 });
 

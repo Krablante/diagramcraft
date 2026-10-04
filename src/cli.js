@@ -13,14 +13,14 @@ import { listThemes, getTheme, ThemeError } from "./themes.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(join(here, "..", "package.json"), "utf8"));
 
-const HELP = `diagramcraft ${pkg.version} — beautiful diagrams from a JSON spec
+const HELP = `dorpie ${pkg.version} — beautiful diagrams from a JSON spec
 
 Usage:
-  diagramcraft render <spec.json|-> [options]     render SVG, PNG and/or ASCII
-  diagramcraft validate <spec.json|-> [--json]    check a spec without rendering
-  diagramcraft themes [id] [--json]               list themes or print one theme
-  diagramcraft schema                             print the spec JSON Schema
-  diagramcraft init [file.json] [--force]         write a starter spec
+  dorpie render <spec.json|-> [options]     render SVG, PNG and/or ASCII
+  dorpie validate <spec.json|-> [--json]    check a spec without rendering
+  dorpie themes [id] [--json]               list themes or print one theme
+  dorpie schema                             print the spec JSON Schema
+  dorpie init [file.json] [--force]         write a starter spec
 
 Render options:
   -t, --theme <id|file.json>   override the theme from the spec
@@ -33,8 +33,8 @@ Render options:
   -q, --quiet                  do not print written file paths
 
 Examples:
-  diagramcraft render diagram.json --format svg,png,ascii
-  diagramcraft render diagram.json --theme glass -o out/
+  dorpie render diagram.json --format svg,png,ascii
+  dorpie render diagram.json --theme glass -o out/
 `;
 
 /**
@@ -238,7 +238,7 @@ function themesCommand(args, values) {
       process.stdout.write(`${JSON.stringify(theme, null, 2)}\n`);
       return 0;
     }
-    throw new ThemeError(`cannot print theme ${JSON.stringify(id)}; run "diagramcraft themes" for the list`);
+    throw new ThemeError(`cannot print theme ${JSON.stringify(id)}; run "dorpie themes" for the list`);
   }
   const themes = listThemes();
   if (values.json) {

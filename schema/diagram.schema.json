@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Krablante/diagramcraft/schema/diagram.schema.json",
-  "title": "DiagramCraft diagram spec",
+  "$id": "https://github.com/Krablante/dorpie/schema/diagram.schema.json",
+  "title": "Dorpie diagram spec",
   "description": "A single editable JSON document that renders to SVG, PNG and ASCII.",
   "type": "object",
   "required": ["nodes"],

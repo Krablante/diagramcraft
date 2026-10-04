@@ -1,19 +1,20 @@
 {
-  "name": "diagramcraft",
-  "version": "0.1.1",
+  "name": "dorpie",
+  "version": "0.2.0",
   "description": "Beautiful, theme-driven diagrams from a JSON spec: SVG, PNG and ASCII. Built for AI agents.",
   "type": "module",
   "license": "MIT",
   "author": "Krablante",
-  "homepage": "https://github.com/Krablante/diagramcraft#readme",
+  "homepage": "https://github.com/Krablante/dorpie#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Krablante/diagramcraft.git"
+    "url": "git+https://github.com/Krablante/dorpie.git"
   },
   "bugs": {
-    "url": "https://github.com/Krablante/diagramcraft/issues"
+    "url": "https://github.com/Krablante/dorpie/issues"
   },
   "keywords": [
+    "dorpie",
     "diagram",
     "flowchart",
     "svg",
@@ -28,7 +29,7 @@
     "node": ">=20"
   },
   "bin": {
-    "diagramcraft": "bin/diagramcraft.js"
+    "dorpie": "bin/dorpie.js"
   },
   "exports": {
     ".": "./src/index.js"

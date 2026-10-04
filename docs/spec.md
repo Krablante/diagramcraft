@@ -1,6 +1,6 @@
 # Spec reference
 
-A diagram is one JSON object. It is the only file you edit: SVG, PNG and ASCII are always rendered from it. `diagramcraft schema` prints the machine-readable JSON Schema.
+A diagram is one JSON object. It is the only file you edit: SVG, PNG and ASCII are always rendered from it. `dorpie schema` prints the machine-readable JSON Schema.
 
 ```jsonc
 {
@@ -100,7 +100,7 @@ A group is a visual zone drawn behind its member nodes. It does not influence la
 
 ## Output defaults
 
-`output.formats` lets a spec decide what `diagramcraft render spec.json` produces:
+`output.formats` lets a spec decide what `dorpie render spec.json` produces:
 
 ```json
 { "output": { "formats": ["svg", "ascii"], "charset": "ascii", "transparent": true } }
@@ -129,7 +129,7 @@ Arrays (like gradient stops) are replaced, not merged.
 
 ## Validation
 
-`diagramcraft validate` reports every problem at once with a JSON path, for example:
+`dorpie validate` reports every problem at once with a JSON path, for example:
 
 ```
 spec error: 3 problems

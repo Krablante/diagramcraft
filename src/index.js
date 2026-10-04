@@ -1,4 +1,4 @@
-// DiagramCraft public API. This is the primary interface: render a spec
+// Dorpie public API. This is the primary interface: render a spec
 // object to SVG, PNG and ASCII without touching the CLI.
 // @ts-check
 import { parseSpec } from "./spec.js";

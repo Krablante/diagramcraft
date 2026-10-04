@@ -4,21 +4,74 @@
   "subtitle": "One JSON file is the source; every output is rendered from it",
   "theme": "classic",
   "direction": "TB",
-  "output": { "formats": ["svg", "png"] },
+  "output": {
+    "formats": [
+      "svg",
+      "png"
+    ]
+  },
   "nodes": [
-    { "id": "idea", "kind": "terminal", "label": "Sketch the flow" },
-    { "id": "spec", "kind": "process", "label": "Write the JSON spec", "note": "nodes, edges, theme" },
-    { "id": "check", "kind": "decision", "label": "Looks right?" },
-    { "id": "render", "kind": "process", "label": "Render SVG, PNG, ASCII" },
-    { "id": "tweak", "kind": "process", "label": "Adjust nodes or theme" },
-    { "id": "ship", "kind": "terminal", "label": "Share it" }
+    {
+      "id": "idea",
+      "kind": "terminal",
+      "label": "Sketch the flow"
+    },
+    {
+      "id": "spec",
+      "kind": "process",
+      "label": "Write the JSON spec",
+      "note": "nodes, edges, theme"
+    },
+    {
+      "id": "check",
+      "kind": "decision",
+      "label": "Looks right?"
+    },
+    {
+      "id": "render",
+      "kind": "process",
+      "label": "Render SVG, PNG, ASCII"
+    },
+    {
+      "id": "tweak",
+      "kind": "process",
+      "label": "Adjust nodes or theme"
+    },
+    {
+      "id": "ship",
+      "kind": "terminal",
+      "label": "Share it"
+    }
   ],
   "edges": [
-    { "from": "idea", "to": "spec" },
-    { "from": "spec", "to": "check" },
-    { "from": "check", "to": "render", "label": "yes" },
-    { "from": "check", "to": "tweak", "label": "no" },
-    { "from": "tweak", "to": "spec", "label": "retry", "kind": "dashed" },
-    { "from": "render", "to": "ship" }
-  ]
+    {
+      "from": "idea",
+      "to": "spec"
+    },
+    {
+      "from": "spec",
+      "to": "check"
+    },
+    {
+      "from": "check",
+      "to": "render",
+      "label": "yes"
+    },
+    {
+      "from": "check",
+      "to": "tweak",
+      "label": "no"
+    },
+    {
+      "from": "tweak",
+      "to": "spec",
+      "label": "retry",
+      "kind": "dashed"
+    },
+    {
+      "from": "render",
+      "to": "ship"
+    }
+  ],
+  "footer": "dorpie"
 }

@@ -1,4 +1,4 @@
-# Using DiagramCraft from an agent
+# Using Dorpie from an agent
 
 This page is written for AI agents and for people who configure them. Everything here is doable without a GUI, a browser or network access.
 
@@ -6,12 +6,12 @@ This page is written for AI agents and for people who configure them. Everything
 
 ```sh
 # from a GitHub release (until the npm package is published)
-npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/latest/download/dorpie-0.2.0.tgz
 # or from a checkout
-node /path/to/diagramcraft/bin/diagramcraft.js <command>
+node /path/to/dorpie/bin/dorpie.js <command>
 
-diagramcraft schema             # full JSON Schema of the spec
-diagramcraft themes             # theme ids and descriptions
+dorpie schema             # full JSON Schema of the spec
+dorpie themes             # theme ids and descriptions
 ```
 
 Example specs are in the repository under [`examples/`](../examples) and in the installed package's `examples/` directory.
@@ -21,14 +21,14 @@ Example specs are in the repository under [`examples/`](../examples) and in the 
 1. **Write or edit one JSON spec.** Keep it as the source of truth. If the user asks for a change, edit the spec — never the SVG, PNG or ASCII.
 2. **Validate before rendering.**
    ```sh
-   diagramcraft validate spec.json          # human-readable
-   diagramcraft validate spec.json --json   # machine-readable
+   dorpie validate spec.json          # human-readable
+   dorpie validate spec.json --json   # machine-readable
    ```
    Exit code `2` means the spec is invalid; every problem is reported with its JSON path.
 3. **Render.** SVG is cheap, ASCII is cheapest, PNG is for the user.
    ```sh
-   diagramcraft render spec.json --format svg,ascii --out out/
-   diagramcraft render spec.json --format png --scale 2 --out out/diagram.png
+   dorpie render spec.json --format svg,ascii --out out/
+   dorpie render spec.json --format png --scale 2 --out out/diagram.png
    ```
 4. **Look at the result.** For PNG, open it with a vision tool and check labels, arrows, overlaps and readability. For quick iterations, read the ASCII — it shows structure, branches and labels without rasterising.
 5. **Fix the spec and render again.** Repeat until the diagram reads well; then deliver the requested files.
@@ -36,17 +36,17 @@ Example specs are in the repository under [`examples/`](../examples) and in the 
 ## System prompt snippet
 
 ```
-You can create and edit diagrams with the diagramcraft CLI.
+You can create and edit diagrams with the dorpie CLI.
 - A diagram is one JSON spec; it is the editable source. Never edit generated
   SVG/PNG/ASCII files; edit the spec and re-render.
-- Before rendering, check the spec shape with `diagramcraft schema` and validate
-  with `diagramcraft validate <file>`. Fix every reported problem.
-- Render with `diagramcraft render <file> --format svg,png,ascii`.
+- Before rendering, check the spec shape with `dorpie schema` and validate
+  with `dorpie validate <file>`. Fix every reported problem.
+- Render with `dorpie render <file> --format svg,png,ascii`.
 - Inspect the PNG yourself (vision) or the ASCII before claiming success.
 - Choose a theme by intent: classic (neutral), paper (warm print), glass
   (modern, translucent), midnight (dark), vivid (colourful), blueprint
   (technical), mono (black-and-white print). List them with
-  `diagramcraft themes`.
+  `dorpie themes`.
 - Keep labels short; use `note` for detail; use edge labels yes/no on decisions;
   use groups for phases, not decoration.
 ```
@@ -88,7 +88,7 @@ You can create and edit diagrams with the diagramcraft CLI.
 ## Programmatic use
 
 ```js
-import { render, parseSpec, listThemes } from "diagramcraft";
+import { render, parseSpec, listThemes } from "dorpie";
 
 const spec = parseSpec(JSON.parse(specText));   // throws SpecError with .issues
 const { svg, png, ascii } = await render(spec, {

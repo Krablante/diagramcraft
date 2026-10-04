@@ -1,4 +1,4 @@
-<h1 align="center">DiagramCraft</h1>
+<h1 align="center">Dorpie</h1>
 
 <p align="center"><strong>Beautiful diagrams from one JSON file.</strong><br>
 Seven complete visual themes, three output formats, no browser and no GUI.<br>
@@ -8,7 +8,7 @@ Designed for AI agents, pleasant for humans.</p>
   <img alt="Transformer block diagram in the Glass theme" src="./docs/gallery/transformer-block.png" width="560">
 </p>
 
-DiagramCraft turns a plain JSON spec into a finished diagram. The spec is the source of truth: you edit nodes and edges there and re-render, so “add one more block” is a two-line change instead of a redraw. Every theme is a full visual system — its own typography, shapes, line work, background and composition — not the same picture recoloured.
+Dorpie turns a plain JSON spec into a finished diagram. The spec is the source of truth: you edit nodes and edges there and re-render, so “add one more block” is a two-line change instead of a redraw. Every theme is a full visual system — its own typography, shapes, line work, background and composition — not the same picture recoloured.
 
 Everything runs locally in Node. No headless browser, no network calls, no accounts. A typical diagram renders in well under a second.
 
@@ -16,14 +16,14 @@ Everything runs locally in Node. No headless browser, no network calls, no accou
 
 ```sh
 # from the GitHub release (works today)
-npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/latest/download/dorpie-0.2.0.tgz
 
 # from the repository
-npm install -g github:Krablante/diagramcraft
+npm install -g github:Krablante/dorpie
 
 # once the npm package is published
-npm install -g diagramcraft
-npx diagramcraft --help
+npm install -g dorpie
+npx dorpie --help
 ```
 
 Node 20 or newer. SVG works everywhere; PNG needs no system libraries (fonts are bundled); ASCII needs nothing at all. Publishing to npm is pending a valid automation token; the release tarball is byte-for-byte the npm package.
@@ -31,8 +31,8 @@ Node 20 or newer. SVG works everywhere; PNG needs no system libraries (fonts are
 ## 30-second quickstart
 
 ```sh
-diagramcraft init hello.json      # writes a starter spec
-diagramcraft render hello.json    # writes hello.svg, hello.png, hello.txt
+dorpie init hello.json      # writes a starter spec
+dorpie render hello.json    # writes hello.svg, hello.png, hello.txt
 ```
 
 ```jsonc
@@ -54,21 +54,21 @@ diagramcraft render hello.json    # writes hello.svg, hello.png, hello.txt
 }
 ```
 
-`diagramcraft render spec.json --theme glass --format png --scale 2` and `--out` control the output. `diagramcraft schema` prints the full JSON Schema, `diagramcraft themes` lists every theme, and `diagramcraft themes paper` prints a theme you can edit.
+`dorpie render spec.json --theme glass --format png --scale 2` and `--out` control the output. `dorpie schema` prints the full JSON Schema, `dorpie themes` lists every theme, and `dorpie themes paper` prints a theme you can edit.
 
 ## For AI agents
 
 The whole product is built around one loop:
 
 1. Write or edit the spec (JSON). Never edit the generated files.
-2. `diagramcraft validate spec.json` — structured errors with paths.
-3. `diagramcraft render spec.json --format svg,png,ascii`.
+2. `dorpie validate spec.json` — structured errors with paths.
+3. `dorpie render spec.json --format svg,png,ascii`.
 4. Look at the PNG (vision) or the ASCII, fix the spec, render again.
 
 `docs/agents.md` has a ready-to-paste system prompt, theme selection guidance and common mistakes. The programmatic API is just as small:
 
 ```js
-import { render } from "diagramcraft";
+import { render } from "dorpie";
 
 const { svg, png, ascii } = await render(spec, {
   theme: "glass",                 // built-in id or path to a theme JSON
@@ -87,7 +87,7 @@ Each theme is a complete system: fonts, line weights, node fills, arrowheads, ba
 | ![Midnight](./docs/gallery/theme-midnight.png) **Midnight** — dark navy, soft glows | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — colour-coded shapes, indigo accent |
 | ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — engineering grid, technical lines | ![Node shapes](./docs/gallery/node-shapes.png) **Every shape** — terminal, decision, data, document, database, connector, note, junction |
 
-Themes are data. Copy one with `diagramcraft themes paper > my-theme.json`, change what you want, and render with `--theme my-theme.json`. Small tweaks stay in the spec:
+Themes are data. Copy one with `dorpie themes paper > my-theme.json`, change what you want, and render with `--theme my-theme.json`. Small tweaks stay in the spec:
 
 ```json
 { "theme": "glass", "style": { "fonts": { "title": { "color": "#4338ca" } } } }
@@ -111,13 +111,13 @@ See [docs/themes.md](./docs/themes.md) for the full token reference.
 ## CLI
 
 ```
-diagramcraft render <spec.json|-> [--theme id|file] [--format svg,png,ascii]
+dorpie render <spec.json|-> [--theme id|file] [--format svg,png,ascii]
                                  [--out path|->] [--scale n] [--transparent]
                                  [--system-fonts] [--charset unicode|ascii]
-diagramcraft validate <spec.json|-> [--json]
-diagramcraft themes [id] [--json]
-diagramcraft schema
-diagramcraft init [file.json] [--force]
+dorpie validate <spec.json|-> [--json]
+dorpie themes [id] [--json]
+dorpie schema
+dorpie init [file.json] [--force]
 ```
 
 Render writes files next to the spec by default and prints their paths. `--out -` streams a single format to stdout.

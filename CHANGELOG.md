@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-10-04
+
+### Changed
+
+- Renamed the product, package, CLI, repository and registry entry to **Dorpie**. There is no `diagramcraft` compatibility layer, alias or legacy output.
+- The theme gallery examples carry a small `dorpie` footer to show the footer field.
+
 ## [0.1.1] - 2026-10-04
 
 ### Fixed

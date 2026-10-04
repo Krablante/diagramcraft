@@ -5,9 +5,9 @@ A theme is a JSON token set: fonts, colours, node paints, strokes, shadows, edge
 Every built-in theme merges over `themes/_base.json`, which holds all defaults. A custom theme only needs to override what it changes.
 
 ```sh
-diagramcraft themes                 # list ids and descriptions
-diagramcraft themes paper > my-theme.json
-diagramcraft render spec.json --theme my-theme.json
+dorpie themes                 # list ids and descriptions
+dorpie themes paper > my-theme.json
+dorpie render spec.json --theme my-theme.json
 ```
 
 Per-spec tweaks use `style`, which is deep-merged over the resolved theme:
