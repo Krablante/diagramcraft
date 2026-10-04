@@ -1,0 +1,235 @@
+{
+  "id": "base",
+  "title": "Base",
+  "description": "Internal defaults shared by every built-in theme.",
+  "tags": [],
+  "order": 0,
+  "canvas": {
+    "background": {
+      "type": "solid",
+      "color": "#ffffff"
+    },
+    "blobs": null,
+    "texture": null,
+    "vignette": null,
+    "padding": 44,
+    "minWidth": 560,
+    "radius": 14
+  },
+  "fonts": {
+    "title": {
+      "family": "Inter",
+      "size": 26,
+      "weight": 600,
+      "color": "#111827",
+      "spacing": 0
+    },
+    "subtitle": {
+      "family": "Inter",
+      "size": 14,
+      "weight": 400,
+      "color": "#6b7280"
+    },
+    "node": {
+      "family": "Inter",
+      "size": 15,
+      "weight": 500,
+      "color": "#111827",
+      "lineHeight": 1.35
+    },
+    "note": {
+      "family": "Inter",
+      "size": 12,
+      "weight": 400,
+      "color": "#6b7280"
+    },
+    "edge": {
+      "family": "Inter",
+      "size": 11.5,
+      "weight": 500,
+      "color": "#4b5563"
+    },
+    "zone": {
+      "family": "Inter",
+      "size": 11,
+      "weight": 600,
+      "color": "#6b7280",
+      "spacing": 0.6,
+      "uppercase": true
+    },
+    "footer": {
+      "family": "Inter",
+      "size": 11,
+      "weight": 400,
+      "color": "#9ca3af"
+    }
+  },
+  "node": {
+    "minWidth": 96,
+    "maxTextWidth": 240,
+    "padX": 18,
+    "padY": 12,
+    "radius": 10,
+    "fill": {
+      "type": "solid",
+      "color": "#ffffff"
+    },
+    "stroke": {
+      "color": "#374151",
+      "width": 1.5
+    },
+    "shadow": {
+      "color": "#0f172a",
+      "opacity": 0.08,
+      "blur": 10,
+      "y": 3
+    },
+    "glow": null,
+    "shine": null,
+    "kinds": {
+      "terminal": {
+        "fill": {
+          "type": "solid",
+          "color": "#f3f4f6"
+        }
+      },
+      "decision": {
+        "fill": {
+          "type": "solid",
+          "color": "#f9fafb"
+        }
+      },
+      "data": {
+        "fill": {
+          "type": "solid",
+          "color": "#f9fafb"
+        }
+      },
+      "document": {
+        "fill": {
+          "type": "solid",
+          "color": "#f9fafb"
+        }
+      },
+      "database": {
+        "fill": {
+          "type": "solid",
+          "color": "#f9fafb"
+        }
+      },
+      "note": {
+        "fill": {
+          "type": "solid",
+          "color": "#fffbeb"
+        },
+        "stroke": {
+          "color": "#d97706",
+          "width": 1.2,
+          "dash": [
+            5,
+            4
+          ]
+        }
+      },
+      "connector": {
+        "size": 44,
+        "fill": {
+          "type": "solid",
+          "color": "#f3f4f6"
+        }
+      },
+      "junction": {
+        "size": 12,
+        "fill": {
+          "type": "solid",
+          "color": "#374151"
+        },
+        "stroke": {
+          "color": "#374151",
+          "width": 0
+        }
+      }
+    },
+    "accent": {
+      "fill": {
+        "type": "solid",
+        "color": "#2563eb"
+      },
+      "stroke": {
+        "color": "#1d4ed8",
+        "width": 1.5
+      },
+      "text": {
+        "color": "#ffffff"
+      }
+    }
+  },
+  "edge": {
+    "stroke": {
+      "color": "#4b5563",
+      "width": 1.6,
+      "dash": null
+    },
+    "cornerRadius": 8,
+    "arrow": {
+      "type": "triangle",
+      "size": 9,
+      "color": null
+    },
+    "label": {
+      "fill": "#ffffff",
+      "padX": 5,
+      "padY": 2,
+      "radius": 4
+    },
+    "kinds": {
+      "dashed": {
+        "dash": [
+          7,
+          5
+        ]
+      },
+      "dotted": {
+        "dash": [
+          1.5,
+          4
+        ]
+      }
+    }
+  },
+  "zone": {
+    "fill": {
+      "type": "solid",
+      "color": "rgba(100,116,139,0.06)"
+    },
+    "stroke": {
+      "color": "rgba(100,116,139,0.35)",
+      "width": 1,
+      "dash": [
+        6,
+        5
+      ]
+    },
+    "radius": 14,
+    "pad": 22,
+    "labelPad": 10,
+    "labelColor": null,
+    "padY": 12
+  },
+  "heading": {
+    "align": "left",
+    "gap": 30,
+    "rule": null,
+    "subtitleGap": 6
+  },
+  "footer": {
+    "gap": 18,
+    "align": "left"
+  },
+  "layout": {
+    "nodeGap": 42,
+    "rankGap": 68,
+    "edgeGap": 16,
+    "edgeLabelGap": 8
+  }
+}

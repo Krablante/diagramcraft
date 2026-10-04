@@ -1,0 +1,41 @@
+{
+  "id": "classic",
+  "title": "Classic",
+  "description": "The standard flowchart: white canvas, crisp dark lines, blue accent.",
+  "tags": ["default", "flowchart", "light"],
+  "order": 1,
+  "canvas": {
+    "background": { "type": "solid", "color": "#ffffff" },
+    "padding": 44,
+    "radius": 10
+  },
+  "fonts": {
+    "title": { "family": "Inter", "size": 26, "weight": 600, "color": "#0f172a" },
+    "subtitle": { "family": "Inter", "size": 14, "weight": 400, "color": "#64748b" },
+    "node": { "family": "Inter", "size": 15, "weight": 500, "color": "#0f172a" },
+    "edge": { "family": "Inter", "size": 11.5, "weight": 500, "color": "#475569" }
+  },
+  "node": {
+    "radius": 9,
+    "fill": { "type": "solid", "color": "#ffffff" },
+    "stroke": { "color": "#334155", "width": 1.5 },
+    "shadow": null,
+    "kinds": {
+      "terminal": { "fill": { "type": "solid", "color": "#f1f5f9" }, "stroke": { "color": "#334155", "width": 1.6 } },
+      "decision": { "fill": { "type": "solid", "color": "#f8fafc" } },
+      "note": { "fill": { "type": "solid", "color": "#fffbeb" }, "stroke": { "color": "#d97706", "width": 1.2, "dash": [5, 4] } }
+    },
+    "accent": {
+      "fill": { "type": "solid", "color": "#2563eb" },
+      "stroke": { "color": "#1e40af", "width": 1.5 },
+      "text": { "color": "#ffffff" }
+    }
+  },
+  "edge": {
+    "stroke": { "color": "#475569", "width": 1.5 },
+    "cornerRadius": 8
+  },
+  "heading": {
+    "rule": { "color": "#2563eb", "width": 3, "length": 56, "gap": 10 }
+  }
+}

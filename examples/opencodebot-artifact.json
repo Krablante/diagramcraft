@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "title": "Artifact to Telegram",
+  "subtitle": "How the bot gateway delivers a file",
+  "theme": "blueprint",
+  "direction": "TB",
+  "nodes": [
+    { "id": "ask", "kind": "terminal", "label": "Explicit send request" },
+    { "id": "check", "kind": "decision", "label": "Allowed?" },
+    { "id": "skip", "kind": "note", "label": "No delivery", "note": "ordinary file reads stay local" },
+    { "id": "spool", "kind": "process", "label": "Stream bytes + bearer token" },
+    { "id": "gateway", "kind": "process", "label": "LAN artifact gateway", "note": "metadata cannot authorize reads" },
+    { "id": "photo", "kind": "decision", "label": "Photo accepted?" },
+    { "id": "document", "kind": "process", "label": "Send as document" },
+    { "id": "topic", "kind": "terminal", "label": "Artifacts topic" }
+  ],
+  "edges": [
+    { "from": "ask", "to": "check" },
+    { "from": "check", "to": "spool", "label": "yes" },
+    { "from": "check", "to": "skip", "label": "no" },
+    { "from": "spool", "to": "gateway" },
+    { "from": "gateway", "to": "photo" },
+    { "from": "photo", "to": "topic", "label": "yes" },
+    { "from": "photo", "to": "document", "label": "no" },
+    { "from": "document", "to": "topic", "label": "fallback", "kind": "dashed" }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "title": "OpenCodez release",
+  "subtitle": "From upstream tag to verified hosts",
+  "theme": "vivid",
+  "direction": "TB",
+  "groups": [
+    { "id": "prepare", "label": "Prepare", "nodes": ["verify", "fetch", "merge", "resolve"] },
+    { "id": "publish", "label": "Publish", "nodes": ["build", "release"] },
+    { "id": "rollout", "label": "Roll out", "nodes": ["install", "harness", "smoke"] }
+  ],
+  "nodes": [
+    { "id": "start", "kind": "terminal", "label": "New upstream release" },
+    { "id": "verify", "kind": "process", "label": "Verify local + GitHub state" },
+    { "id": "fetch", "kind": "process", "label": "Find the latest upstream tag" },
+    { "id": "merge", "kind": "process", "label": "Merge the tag into main" },
+    { "id": "conflict", "kind": "decision", "label": "Conflicts?" },
+    { "id": "resolve", "kind": "process", "label": "Resolve, keep the OpenCodez layer" },
+    { "id": "build", "kind": "process", "label": "Build +opencodez.N artifact" },
+    { "id": "release", "kind": "process", "label": "Publish GitHub release", "accent": true },
+    { "id": "install", "kind": "process", "label": "Install binaries on hosts" },
+    { "id": "harness", "kind": "process", "label": "Restart services via harness" },
+    { "id": "smoke", "kind": "process", "label": "Canary + health checks" },
+    { "id": "done", "kind": "terminal", "label": "Release verified" }
+  ],
+  "edges": [
+    { "from": "start", "to": "verify" },
+    { "from": "verify", "to": "fetch" },
+    { "from": "fetch", "to": "merge" },
+    { "from": "merge", "to": "conflict" },
+    { "from": "conflict", "to": "resolve", "label": "yes" },
+    { "from": "resolve", "to": "build" },
+    { "from": "conflict", "to": "build", "label": "no", "kind": "dashed" },
+    { "from": "build", "to": "release" },
+    { "from": "release", "to": "install" },
+    { "from": "install", "to": "harness" },
+    { "from": "harness", "to": "smoke" },
+    { "from": "smoke", "to": "done" }
+  ]
+}

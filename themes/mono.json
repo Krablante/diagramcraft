@@ -1,0 +1,52 @@
+{
+  "id": "mono",
+  "title": "Mono",
+  "description": "Black-and-white print diagram: monospace type, square corners, zero colour.",
+  "tags": ["print", "monochrome", "monospace"],
+  "order": 7,
+  "canvas": {
+    "background": { "type": "solid", "color": "#ffffff" },
+    "padding": 44,
+    "radius": 0
+  },
+  "fonts": {
+    "title": { "family": "JetBrains Mono", "size": 23, "weight": 700, "color": "#000000" },
+    "subtitle": { "family": "JetBrains Mono", "size": 12.5, "weight": 400, "color": "#444444" },
+    "node": { "family": "JetBrains Mono", "size": 13, "weight": 400, "color": "#000000" },
+    "note": { "family": "JetBrains Mono", "size": 11, "weight": 400, "color": "#555555" },
+    "edge": { "family": "JetBrains Mono", "size": 10.5, "weight": 400, "color": "#000000" },
+    "zone": { "family": "JetBrains Mono", "size": 10, "weight": 700, "color": "#333333", "spacing": 0.6, "uppercase": true }
+  },
+  "node": {
+    "radius": 2,
+    "padX": 16,
+    "padY": 11,
+    "fill": { "type": "solid", "color": "#ffffff" },
+    "stroke": { "color": "#000000", "width": 1.4 },
+    "shadow": null,
+    "kinds": {
+      "terminal": { "fill": { "type": "solid", "color": "#f2f2f2" }, "stroke": { "color": "#000000", "width": 1.6 } },
+      "decision": { "fill": { "type": "solid", "color": "#fafafa" } },
+      "note": { "fill": { "type": "solid", "color": "#ffffff" }, "stroke": { "color": "#000000", "width": 1.2, "dash": [4, 3] } }
+    },
+    "accent": {
+      "fill": { "type": "solid", "color": "#000000" },
+      "stroke": { "color": "#000000", "width": 1.4 },
+      "text": { "color": "#ffffff" }
+    }
+  },
+  "edge": {
+    "stroke": { "color": "#000000", "width": 1.4 },
+    "cornerRadius": 0,
+    "arrow": { "type": "vee", "size": 10, "color": "#000000" },
+    "label": { "fill": "#ffffff", "radius": 0 }
+  },
+  "zone": {
+    "fill": { "type": "solid", "color": "rgba(0,0,0,0.03)" },
+    "stroke": { "color": "rgba(0,0,0,0.55)", "width": 1, "dash": [4, 3] },
+    "radius": 0
+  },
+  "heading": {
+    "rule": { "color": "#000000", "width": 2, "length": 56, "gap": 10 }
+  }
+}

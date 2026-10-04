@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "title": "BURO registry change",
+  "subtitle": "How a durable fact lands in the registry",
+  "theme": "paper",
+  "direction": "TB",
+  "nodes": [
+    { "id": "task", "kind": "terminal", "label": "Registry task" },
+    { "id": "draft", "kind": "process", "label": "buro draft pull / new", "note": "revision-checked draft file" },
+    { "id": "edit", "kind": "process", "label": "Edit the draft", "note": "facts, paths, rules" },
+    { "id": "diff", "kind": "process", "label": "Inspect buro draft diff" },
+    { "id": "check", "kind": "decision", "label": "Change correct?" },
+    { "id": "fix", "kind": "process", "label": "Adjust the draft" },
+    { "id": "push", "kind": "process", "label": "buro draft push", "accent": true },
+    { "id": "verify", "kind": "process", "label": "Render the packet", "note": "confirm the change is visible" },
+    { "id": "done", "kind": "terminal", "label": "Facts updated" }
+  ],
+  "edges": [
+    { "from": "task", "to": "draft" },
+    { "from": "draft", "to": "edit" },
+    { "from": "edit", "to": "diff" },
+    { "from": "diff", "to": "check" },
+    { "from": "check", "to": "push", "label": "yes" },
+    { "from": "check", "to": "fix", "label": "no" },
+    { "from": "fix", "to": "edit", "label": "revise", "kind": "dashed" },
+    { "from": "push", "to": "verify" },
+    { "from": "verify", "to": "done" }
+  ]
+}

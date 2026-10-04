@@ -1,0 +1,65 @@
+{
+  "name": "diagramcraft",
+  "version": "0.1.0",
+  "description": "Beautiful, theme-driven diagrams from a JSON spec: SVG, PNG and ASCII. Built for AI agents.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Krablante",
+  "homepage": "https://github.com/Krablante/diagramcraft#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Krablante/diagramcraft.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Krablante/diagramcraft/issues"
+  },
+  "keywords": [
+    "diagram",
+    "flowchart",
+    "svg",
+    "png",
+    "ascii",
+    "themes",
+    "llm",
+    "agent",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "diagramcraft": "bin/diagramcraft.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "themes",
+    "assets",
+    "schema",
+    "examples",
+    "docs/spec.md",
+    "docs/themes.md",
+    "docs/agents.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test 'test/*.test.js'",
+    "typecheck": "tsc -p tsconfig.json",
+    "check": "npm run typecheck && npm test",
+    "metrics": "node scripts/build-metrics.mjs",
+    "gallery": "node scripts/gallery.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "elkjs": "^0.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "opentype.js": "^1.3.4",
+    "typescript": "^5.7.0"
+  }
+}

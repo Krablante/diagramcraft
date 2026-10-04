@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "title": "Every node kind",
+  "subtitle": "Shapes available to the spec",
+  "theme": "classic",
+  "direction": "LR",
+  "nodes": [
+    { "id": "terminal", "kind": "terminal", "label": "terminal" },
+    { "id": "process", "kind": "process", "label": "process" },
+    { "id": "decision", "kind": "decision", "label": "decision" },
+    { "id": "data", "kind": "data", "label": "data" },
+    { "id": "document", "kind": "document", "label": "document" },
+    { "id": "database", "kind": "database", "label": "database" },
+    { "id": "connector", "kind": "connector", "label": "A" },
+    { "id": "note", "kind": "note", "label": "note", "note": "small print" },
+    { "id": "junction", "kind": "junction", "label": "" }
+  ],
+  "edges": [
+    { "from": "terminal", "to": "process" },
+    { "from": "process", "to": "decision" },
+    { "from": "decision", "to": "data" },
+    { "from": "data", "to": "document" },
+    { "from": "document", "to": "database" },
+    { "from": "database", "to": "connector" },
+    { "from": "connector", "to": "note" },
+    { "from": "note", "to": "junction" }
+  ]
+}

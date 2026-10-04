@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "title": "Transformer block",
+  "subtitle": "Residual stream with attention and feed-forward layers",
+  "theme": "glass",
+  "direction": "TB",
+  "groups": [
+    { "id": "block", "label": "Repeated × N", "nodes": ["attn", "add1", "norm1", "ffn", "add2", "norm2"] }
+  ],
+  "nodes": [
+    { "id": "tokens", "kind": "data", "label": "Token ids" },
+    { "id": "embed", "kind": "process", "label": "Token + position embedding" },
+    { "id": "attn", "kind": "process", "label": "Multi-head self-attention", "accent": true },
+    { "id": "add1", "kind": "junction", "label": "" },
+    { "id": "norm1", "kind": "process", "label": "LayerNorm" },
+    { "id": "ffn", "kind": "process", "label": "Feed-forward network", "note": "4× hidden width" },
+    { "id": "add2", "kind": "junction", "label": "" },
+    { "id": "norm2", "kind": "process", "label": "LayerNorm" },
+    { "id": "logits", "kind": "data", "label": "Next-token logits" }
+  ],
+  "edges": [
+    { "from": "tokens", "to": "embed" },
+    { "from": "embed", "to": "attn" },
+    { "from": "embed", "to": "add1", "label": "residual", "kind": "dashed" },
+    { "from": "attn", "to": "add1" },
+    { "from": "add1", "to": "norm1" },
+    { "from": "norm1", "to": "ffn" },
+    { "from": "norm1", "to": "add2", "label": "residual", "kind": "dashed" },
+    { "from": "ffn", "to": "add2" },
+    { "from": "add2", "to": "norm2" },
+    { "from": "norm2", "to": "logits" }
+  ]
+}

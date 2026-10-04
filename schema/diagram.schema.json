@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Krablante/diagramcraft/schema/diagram.schema.json",
+  "title": "DiagramCraft diagram spec",
+  "description": "A single editable JSON document that renders to SVG, PNG and ASCII.",
+  "type": "object",
+  "required": ["nodes"],
+  "properties": {
+    "version": { "const": 1, "description": "Spec version. Defaults to 1." },
+    "title": { "type": "string", "description": "Diagram title rendered above the flow." },
+    "subtitle": { "type": "string", "description": "Smaller line under the title." },
+    "footer": { "type": "string", "description": "Small line at the bottom of the canvas." },
+    "theme": { "type": "string", "default": "classic", "description": "Built-in theme id or a path to a theme JSON file." },
+    "direction": { "enum": ["TB", "LR", "RL", "BT"], "default": "TB", "description": "Flow direction: top-to-bottom, left-to-right, right-to-left, bottom-to-top." },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "nodeGap": { "type": "number", "exclusiveMinimum": 0, "description": "Gap between nodes in the same layer." },
+        "rankGap": { "type": "number", "exclusiveMinimum": 0, "description": "Gap between layers." },
+        "edgeGap": { "type": "number", "exclusiveMinimum": 0, "description": "Gap between edges and nodes." }
+      },
+      "additionalProperties": false
+    },
+    "style": { "type": "object", "description": "Deep overrides merged over the resolved theme (colours, fonts, spacing)." },
+    "output": {
+      "type": "object",
+      "properties": {
+        "formats": { "type": "array", "minItems": 1, "items": { "enum": ["svg", "png", "ascii"] } },
+        "scale": { "type": "number", "exclusiveMinimum": 0, "description": "PNG scale factor." },
+        "transparent": { "type": "boolean", "description": "Drop the canvas background." },
+        "charset": { "enum": ["unicode", "ascii"], "description": "ASCII output character set." }
+      },
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "description": "Unique id referenced by edges and groups." },
+          "label": { "type": "string", "description": "Node text. Defaults to the id; junction nodes have no label." },
+          "kind": {
+            "enum": ["terminal", "process", "decision", "data", "document", "database", "connector", "note", "junction"],
+            "default": "process"
+          },
+          "note": { "type": "string", "description": "Small second line inside the node." },
+          "accent": { "type": "boolean", "description": "Highlight the node with the theme accent." },
+          "color": { "type": "string", "description": "Solid fill colour for this node." },
+          "maxWidth": { "type": "number", "exclusiveMinimum": 0, "description": "Wrap text at this width." },
+          "width": { "type": "number", "exclusiveMinimum": 0, "description": "Fixed node width." },
+          "height": { "type": "number", "exclusiveMinimum": 0, "description": "Fixed node height." }
+        },
+        "additionalProperties": false
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string", "description": "Source node id." },
+          "to": { "type": "string", "description": "Target node id." },
+          "label": { "type": "string", "description": "Short label, usually yes/no." },
+          "kind": { "enum": ["solid", "dashed", "dotted"], "default": "solid" },
+          "arrow": { "enum": ["end", "both", "none"], "default": "end" },
+          "color": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Visual zones around member nodes. Groups do not constrain layout.",
+      "items": {
+        "type": "object",
+        "required": ["nodes"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string", "description": "Zone label, placed in the left gutter." },
+          "nodes": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "color": { "type": "string", "description": "Zone fill colour override." }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
