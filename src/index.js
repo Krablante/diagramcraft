@@ -15,6 +15,7 @@ export { renderSvg } from "./svg.js";
 export { renderAscii } from "./ascii.js";
 export { svgToPng, bundledFontFiles } from "./png.js";
 export { getTheme, loadThemeFile, listThemes, ThemeError } from "./themes.js";
+export { createLibrary, resolveConfig, LibraryError } from "./library.js";
 
 /**
  * Render a spec (raw object or JSON string) into the requested formats.

@@ -4,6 +4,14 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-10-04
+
+- One package now includes an OpenCode/OpenCodez plugin with six agent tools and PNG attachments. `dorpie plugin install` connects it without rewriting user configuration.
+- Shared saved-diagram library with stable IDs, searchable metadata, immutable source revisions and explicit revision conflict handling.
+- Preserved exports keep source/theme snapshots, rendering settings, Dorpie version and output hashes. CLI and plugin reopen the same work across sessions.
+- Configurable library/export directories, portable defaults and paginated metadata queries. The plugin and library entrypoint load the renderer only when needed.
+- New save/list/get/history/export/settings CLI commands; existing stateless render behavior is preserved. English and Russian plugin/library guides ship in the package.
+
 ## [0.2.1] - 2026-10-04
 
 ### Added

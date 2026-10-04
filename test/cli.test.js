@@ -106,3 +106,32 @@ console.log(listThemes().length, result.svg.length > 100, result.ascii.includes(
   const out = execFileSync(process.execPath, ["--input-type=module", "-e", script], { encoding: "utf8" });
   assert.equal(out.trim().split(" ").slice(0, 3).join(" "), "7 true true");
 });
+
+test("saved CLI workflow reopens, updates, exports and reports conflicts", () => {
+  const dir = mkdtempSync(join(tmpdir(), "dorpie-cli-library-"));
+  try {
+    const config = join(dir, "config.json");
+    writeFileSync(config, JSON.stringify({ libraryDir: join(dir, "library") }));
+    const common = ["--config", config];
+    const saved = run(["save", example, "--name", "CLI diagram", ...common]);
+    assert.equal(saved.status, 0, saved.stderr);
+    const { id, revision } = JSON.parse(saved.stdout);
+    assert.equal(revision, 1);
+    assert.equal(JSON.parse(run(["list", "CLI diagram", ...common]).stdout).total, 1);
+    assert.ok(JSON.parse(run(["get", id, "--spec", ...common]).stdout).nodes.length);
+    const updated = run(["save", example, "--id", id, "--expected-revision", "1", ...common]);
+    assert.equal(updated.status, 0, updated.stderr);
+    const conflict = run(["save", example, "--id", id, "--expected-revision", "1", ...common]);
+    assert.equal(conflict.status, 2);
+    assert.match(conflict.stderr, /CONFLICT/);
+    const exported = run(["export", id, "--revision", "1", "--format", "svg", ...common]);
+    assert.equal(exported.status, 0, exported.stderr);
+    assert.ok(existsSync(JSON.parse(exported.stdout).files.svg));
+    assert.equal(JSON.parse(run(["history", id, ...common]).stdout).revisionCount, 2);
+    assert.equal(run(["export", id, "--out", join(dir, "bad.svg"), ...common]).status, 2);
+    assert.equal(run(["get", id, "--revision", "invalid", ...common]).status, 2);
+    const installed = run(["plugin", "install", "--config-dir", join(dir, "profile")]);
+    assert.equal(installed.status, 0, installed.stderr);
+    assert.ok(existsSync(join(dir, "profile", "plugins", "dorpie.js")));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

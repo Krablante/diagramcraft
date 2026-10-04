@@ -12,7 +12,7 @@
   <img alt="Схема transformer-блока в теме Glass" src="./docs/gallery/transformer-block.png" width="560">
 </p>
 
-Dorpie — консольная утилита и библиотека для Node: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой.
+Dorpie — консольная утилита, библиотека для Node и плагин OpenCode/OpenCodez: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой. Сохранённые диаграммы хранят версии исходников и историю экспортов между сессиями агента.
 
 Всё работает локально в Node: без headless-браузера, без сетевых запросов во время рендера, без аккаунтов. Типичная диаграмма рендерится заметно меньше чем за секунду. Каждая тема — это целостная визуальная система со своей типографикой, формами, линиями, фоном и композицией, а не одна и та же картинка в другой палитре.
 
@@ -21,7 +21,7 @@ Dorpie — консольная утилита и библиотека для No
 Нужен Node 20 или новее. Пакет распространяется как tarball во вложениях GitHub-релизов:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
 dorpie --version
 ```
 
@@ -34,6 +34,8 @@ npm install -g github:Krablante/dorpie
 Публикации в npm пока нет, поэтому `npm install -g dorpie` не сработает.
 
 ## Быстрый старт
+
+Для подключения установленного пакета к OpenCodez выполните `dorpie plugin install --app opencodez` и перезапустите бэкенд. Для upstream OpenCode используйте `--app opencode`. Второй пакет или сервис не нужен. См. [установку плагина и инструменты](./docs/plugin.ru.md).
 
 ```sh
 dorpie init hello.json      # создаёт стартовую спеку
@@ -65,6 +67,8 @@ dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
 ```
 
 `dorpie validate spec.json` проверяет спеку без рендера и показывает все проблемы с JSON-путями. Флаги CLI перекрывают спеку: `dorpie render spec.json --theme glass --format png --scale 2 --out out/`. Полный справочник команд — в [docs/cli.ru.md](./docs/cli.ru.md).
+
+Для работы, к которой нужно вернуться позже, используйте `dorpie save spec.json --name "Deploy flow"`, затем `dorpie export <полученный-id>`. Команды `dorpie list`, `get` и `history` находят прежние диаграммы и их версии. CLI и плагин используют одну настраиваемую библиотеку; экспорты сохраняют собственные файлы, снимок исходника и тему. См. [сохранённые диаграммы и настройки](./docs/library.ru.md).
 
 ## Форматы вывода
 
@@ -132,6 +136,13 @@ dorpie validate <spec.json|-> [--json]
 dorpie themes [id] [--json]
 dorpie schema
 dorpie init [file.json] [--force]
+dorpie save <spec.json|-> [--name NAME] [--id ID --expected-revision N]
+dorpie list [query] [--project PATH]
+dorpie get <id> [--revision N] [--spec]
+dorpie history <id>
+dorpie export <id> [--revision N] [--theme id|file] [--export-dir PATH]
+dorpie settings
+dorpie plugin install [--app opencodez|opencode]
 ```
 
 По умолчанию рендер пишет файлы рядом со спекой и печатает их пути; `--out -` выводит один формат в stdout. Коды возврата: `0` — успех, `2` — некорректная спека или аргументы, `1` — ошибка времени выполнения. Правила выбора путей и разбор типичных проблем — в [docs/cli.ru.md](./docs/cli.ru.md).
@@ -143,6 +154,8 @@ dorpie init [file.json] [--force]
 - [docs/themes.ru.md](./docs/themes.ru.md) — токены тем и как написать свою
 - [docs/api.ru.md](./docs/api.ru.md) — Node API для встраивания Dorpie
 - [docs/agents.ru.md](./docs/agents.ru.md) — рабочий цикл агента и системный промпт
+- [docs/plugin.ru.md](./docs/plugin.ru.md) — установка OpenCode/OpenCodez и инструменты агента
+- [docs/library.ru.md](./docs/library.ru.md) — сохранённые диаграммы, версии, экспорты и настройки
 - [CONTRIBUTING.ru.md](./CONTRIBUTING.ru.md) — локальная разработка, архитектура и релизы
 - [CHANGELOG.ru.md](./CHANGELOG.ru.md) — история версий
 

@@ -2,7 +2,7 @@
 
 [English](./CONTRIBUTING.md) · [Русский](./CONTRIBUTING.ru.md) · [Home](./README.md)
 
-Thanks for taking a look. The project is small on purpose: a plain ESM package with no build step, two runtime dependencies and a documented spec. The fastest way in is:
+Thanks for taking a look. The project is small on purpose: a plain ESM package with no build step and a documented spec. The renderer uses ELK and resvg; the plugin uses Zod for tool arguments. The fastest way in is:
 
 ```sh
 git clone https://github.com/Krablante/dorpie
@@ -45,12 +45,14 @@ spec JSON ─▶ parseSpec ─▶ theme resolution ─▶ layoutSpec (ELK) ─�
 | `src/png.js` | SVG to PNG with resvg and the bundled fonts. |
 | `src/index.js` | Public API (`render`, `parseSpec`, theme helpers). |
 | `src/cli.js` | Argument parsing, file IO and exit codes only. |
+| `src/library.js`, `src/config.js` | Immutable saved revisions, export history and shared settings. |
+| `src/opencode-plugin.js`, `src/plugin-install.js` | Agent tools and a config-preserving plugin installer. |
 
 Invariants to preserve:
 
 - **The spec is the only editable source.** Generated SVG/PNG/ASCII are outputs; nothing must require editing them.
 - **Themes are data.** Built-in themes live in `themes/*.json` and merge over `themes/_base.json`. Do not add theme-specific branches to the renderer; add tokens or primitives instead.
-- **No build step, no hidden runtime.** Plain ESM with two runtime dependencies (`elkjs`, `@resvg/resvg-js`). Do not add a bundler or transpiler.
+- **No build step, no hidden runtime.** Plain ESM with renderer dependencies `elkjs`, `@resvg/resvg-js` and plugin argument schemas from `zod`. Do not add a bundler or transpiler.
 - **Deterministic output.** The same spec and theme must produce byte-identical SVG. Bundled fonts stay in `assets/fonts/` with their OFL licenses and are regenerated via `npm run metrics`.
 - **PNG is local.** No browser, no network, no system fonts by default.
 - **ASCII and SVG use separate layouts** (character cell space vs pixels); both render from the same spec and model.
@@ -60,6 +62,7 @@ Invariants to preserve:
 - **Spec or validation:** update `src/spec.js`, `schema/diagram.schema.json`, `docs/spec.md` and `docs/spec.ru.md`, and the tests in `test/spec.test.js`. The published schema and the validator must agree.
 - **Renderer, layout or theme:** render an example in the affected themes and inspect the PNG (composition, labels, overlaps, contrast). Run `npm run gallery` and commit the refreshed images. Update `docs/themes.md` and `docs/themes.ru.md` for token changes.
 - **CLI:** update `src/cli.js`, its `HELP` text and `docs/cli.md` + `docs/cli.ru.md`, and keep `test/cli.test.js` covering the command.
+- **Library/plugin:** keep shared behavior in `src/library.js`; plugin and CLI are adapters. `test/library.test.js` covers persistence, conflicts, exports, permissions and installation. Update `docs/library*` and `docs/plugin*` together. Keep immutable source revisions separate from derived exports.
 - **Examples:** `examples/` doubles as documentation and test fixtures; keep every file valid and representative. `scripts/gallery.mjs` renders them into `docs/gallery`.
 - **Documentation:** English and Russian versions are maintained together with the same structure and content. Each page links to its counterpart.
 

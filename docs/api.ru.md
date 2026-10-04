@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Установка из релизного tarball или прямо из репозитория:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
 # или, следя за main:
 npm install github:Krablante/dorpie
 ```
@@ -31,7 +31,7 @@ const { svg, png, ascii } = await render(spec, {
 });
 ```
 
-`render(input, options)` принимает объект спеки или JSON-строку и возвращает promise. На диск ничего не пишется — файлы сохраняет CLI.
+`render(input, options)` принимает объект спеки или JSON-строку и возвращает Promise. На диск ничего не пишет. Для сохранённых диаграмм, версий исходников и экспортов используйте `createLibrary` из `dorpie` или лёгкого входа `dorpie/library`; см. [library.ru.md](./library.ru.md).
 
 | Опция | Тип | По умолчанию | Смысл |
 | --- | --- | --- | --- |

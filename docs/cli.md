@@ -2,7 +2,7 @@
 
 [English](./cli.md) · [Русский](./cli.ru.md) · [Home](../README.md)
 
-`dorpie` is a single executable with five commands. It reads a JSON spec from a file or from standard input, and has no config file and no environment variables: everything comes from command-line arguments and the spec itself. Node 20 or newer is required.
+`dorpie` is a single executable for rendering, saved diagrams and plugin setup. Plain rendering reads JSON from a file or standard input and uses only arguments and the spec. Library commands also read the optional Dorpie config. Node 20 or newer is required.
 
 | Command | Purpose |
 | --- | --- |
@@ -11,6 +11,13 @@
 | `dorpie themes [id]` | List built-in themes, or print one resolved theme as JSON. |
 | `dorpie schema` | Print the JSON Schema of the spec. |
 | `dorpie init [file.json]` | Write a starter spec. |
+| `dorpie save <spec.json\|->` | Create a saved diagram; update with `--id` and `--expected-revision`. |
+| `dorpie list [query]` | Search saved diagrams; optionally filter `--project`, paginate with `--limit`/`--offset`. |
+| `dorpie get <id>` | Read metadata and JSON; `--spec` returns only source, `--revision N` selects a version. |
+| `dorpie history <id>` | Read source and export history with `--limit`/`--offset`. |
+| `dorpie export <id>` | Preserve an export; optionally select `--revision N` and render options. |
+| `dorpie settings` | Show resolved library settings. |
+| `dorpie plugin install` | Connect the package to `--app opencodez` (default) or `--app opencode`. |
 | `dorpie --help`, `dorpie --version` | Usage and version. |
 
 ## render
@@ -111,6 +118,8 @@ Without `--force`, `init` refuses to replace an existing file and exits with cod
 
 ## Exit codes
 
+Library commands print JSON. They accept `--config`, `--library-dir` and `--export-dir`. `save` accepts `--name`, `--description`, `--tags` (comma-separated), `--project` and `--change`. `export` accepts the render options above except `--out`/`--quiet`; use `--export-dir` to choose its destination. The default export formats are SVG, PNG and ASCII. See [library.md](./library.md) for storage, conflicts and configuration; [plugin.md](./plugin.md) covers installation and `--config-dir`.
+
 | Code | Meaning |
 | --- | --- |
 | `0` | Success. |
@@ -118,6 +127,8 @@ Without `--force`, `init` refuses to replace an existing file and exits with cod
 | `1` | Runtime failure, for example an unreadable input file or an IO error. |
 
 Spec and theme errors go to stderr with readable paths, so a script can rely on the code and still log the message.
+
+Library `INVALID_ARGUMENT`, `NOT_FOUND` and `CONFLICT` errors also exit `2`. A conflict requires reading the current version and reconciling changes before saving.
 
 ## Troubleshooting
 

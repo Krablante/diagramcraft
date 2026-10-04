@@ -8,7 +8,7 @@
 
 ```sh
 # глобальная установка из релизного tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
 
 # или запуск прямо из репозитория, без установки
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -102,4 +102,4 @@ const { svg, png, ascii } = await render(spec, {
 });
 ```
 
-`render` никогда не пишет файлы. CLI лишь добавляет вокруг него ввод-вывод. Полное описание — опции, поля результата, ошибки и экспорты нижнего уровня — в [api.ru.md](./api.ru.md).
+`render` никогда не пишет файлы. CLI добавляет вокруг него ввод-вывод. Для работы, которую нужно открыть в другой сессии, используйте общую библиотеку и инструменты плагина list/get/save/history/export. Получите схему спеки через `dorpie_help`, сохраните JSON, экспортируйте, проверьте PNG и записывайте новые версии с точным `expectedRevision`. См. [plugin.ru.md](./plugin.ru.md) и [library.ru.md](./library.ru.md). API рендера описан в [api.ru.md](./api.ru.md).

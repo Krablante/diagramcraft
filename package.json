@@ -1,6 +1,6 @@
 {
   "name": "dorpie",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Beautiful, theme-driven diagrams from a JSON spec: SVG, PNG and ASCII. Built for AI agents.",
   "type": "module",
   "license": "MIT",
@@ -23,7 +23,10 @@
     "themes",
     "llm",
     "agent",
-    "cli"
+    "cli",
+    "opencode",
+    "opencodez",
+    "opencode-plugin"
   ],
   "engines": {
     "node": ">=20"
@@ -32,7 +35,9 @@
     "dorpie": "bin/dorpie.js"
   },
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./server": "./src/opencode-plugin.js",
+    "./library": "./src/library.js"
   },
   "files": [
     "bin",
@@ -51,10 +56,16 @@
     "docs/api.ru.md",
     "docs/agents.md",
     "docs/agents.ru.md",
+    "docs/library.md",
+    "docs/library.ru.md",
+    "docs/plugin.md",
+    "docs/plugin.ru.md",
     "README.md",
     "README.ru.md",
     "CHANGELOG.md",
     "CHANGELOG.ru.md",
+    "CONTRIBUTING.md",
+    "CONTRIBUTING.ru.md",
     "LICENSE"
   ],
   "scripts": {
@@ -66,7 +77,8 @@
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
-    "elkjs": "^0.11.0"
+    "elkjs": "^0.11.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

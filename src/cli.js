@@ -6,9 +6,10 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "no
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { render } from "./index.js";
 import { parseSpec, SpecError } from "./spec.js";
 import { listThemes, getTheme, ThemeError } from "./themes.js";
+import { createLibrary, LibraryError } from "./library.js";
+import { installPlugin } from "./plugin-install.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(join(here, "..", "package.json"), "utf8"));
@@ -21,6 +22,23 @@ Usage:
   dorpie themes [id] [--json]               list themes or print one theme
   dorpie schema                             print the spec JSON Schema
   dorpie init [file.json] [--force]         write a starter spec
+  dorpie save <spec.json|-> [--id ID --expected-revision N] [--name NAME]
+  dorpie list [query] [--project PATH] [--limit N --offset N]
+  dorpie get <id> [--revision N] [--spec]   read editable JSON
+  dorpie history <id> [--limit N --offset N]
+  dorpie export <id> [--revision N] [render options]
+  dorpie settings                         show resolved library paths
+  dorpie plugin install [--app opencodez|opencode] [--config-dir PATH]
+
+Library options:
+      --library-dir PATH      source revisions and metadata
+      --export-dir PATH       preserved exports (default: library/exports)
+      --config PATH           Dorpie config JSON
+      --description TEXT      searchable diagram description
+      --tags LIST             comma-separated tags
+      --change TEXT           revision note
+      --project PATH          project/worktree label (save default: cwd)
+Library commands print JSON. Export defaults to svg,png,ascii.
 
 Render options:
   -t, --theme <id|file.json>   override the theme from the spec
@@ -61,6 +79,11 @@ export async function run(argv) {
         quiet: { type: "boolean", short: "q" },
         help: { type: "boolean", short: "h" },
         version: { type: "boolean", short: "v" },
+        "library-dir": { type: "string" }, "export-dir": { type: "string" }, config: { type: "string" },
+        id: { type: "string" }, "expected-revision": { type: "string" }, revision: { type: "string" },
+        name: { type: "string" }, description: { type: "string" }, tags: { type: "string" }, change: { type: "string" },
+        project: { type: "string" }, limit: { type: "string" }, offset: { type: "string" }, spec: { type: "boolean" },
+        app: { type: "string" }, "config-dir": { type: "string" },
       },
     });
   } catch (error) {
@@ -88,6 +111,7 @@ export async function run(argv) {
       return 0;
     }
     if (command === "init") return initCommand(positionals.slice(1), values);
+    if (["save", "list", "get", "history", "export", "settings", "plugin"].includes(command)) return await libraryCommand(command, positionals.slice(1), values);
     process.stderr.write(`error: unknown command ${JSON.stringify(command)}\n\n${HELP}`);
     return 2;
   } catch (error) {
@@ -100,9 +124,64 @@ export async function run(argv) {
       process.stderr.write(`theme error: ${error.message}\n`);
       return 2;
     }
+    if (error instanceof LibraryError) {
+      process.stderr.write(`error [${error.code}]: ${error.message}\n`);
+      return 2;
+    }
     process.stderr.write(`error: ${error instanceof Error ? error.message : String(error)}\n`);
     return 1;
   }
+}
+
+/** @param {string} command @param {string[]} args @param {Record<string,any>} values */
+async function libraryCommand(command, args, values) {
+  const allowed = {
+    plugin: ["app", "config-dir"], settings: [],
+    save: ["id", "expected-revision", "name", "description", "tags", "project", "change"],
+    list: ["project", "limit", "offset"], get: ["revision", "spec"], history: ["limit", "offset"],
+    export: ["revision", "theme", "format", "scale", "transparent", "charset", "system-fonts"],
+  };
+  for (const key of Object.keys(values)) {
+    if (!["json", ...(command === "plugin" ? [] : ["library-dir", "export-dir", "config"]), ...allowed[command]].includes(key)) throw new LibraryError(`--${key} is not supported by ${command}`);
+  }
+  if (command === "plugin") {
+    if (args.length !== 1 || args[0] !== "install") throw new LibraryError("Use dorpie plugin install [--app opencodez|opencode]");
+    process.stdout.write(`${JSON.stringify(await installPlugin({ app: values.app, configDir: values["config-dir"] }), null, 2)}\n`);
+    if (!values.json) process.stderr.write("Restart the selected application to load Dorpie.\n");
+    return 0;
+  }
+  if (args.length > (command === "settings" ? 0 : 1)) throw new LibraryError(`Unexpected arguments for ${command}`);
+  const library = createLibrary({ libraryDir: values["library-dir"], exportDir: values["export-dir"], configFile: values.config });
+  /** @param {string} key */
+  const number = (key) => {
+    if (values[key] === undefined) return undefined;
+    const value = Number(values[key]);
+    if (!Number.isSafeInteger(value) || value < (key === "offset" ? 0 : 1)) throw new LibraryError(`--${key} must be ${key === "offset" ? "a nonnegative" : "a positive"} integer`);
+    return value;
+  };
+  const page = { limit: number("limit"), offset: number("offset") };
+  let result;
+  if (command === "settings") result = library.config;
+  if (command === "list") result = await library.list({ query: args[0], project: values.project, ...page });
+  if (["save", "get", "history", "export"].includes(command) && !args[0]) throw new LibraryError(`Missing ${command === "save" ? "spec path (or -)" : "diagram ID"}`);
+  if (command === "save") {
+    const input = readSpecInput(args[0]);
+    result = await library.save(parseInput(input.text, input.path), { id: values.id, expectedRevision: number("expected-revision"),
+      name: values.name, description: values.description, tags: values.tags?.split(",").map((t) => t.trim()).filter(Boolean),
+      change: values.change, project: values.project ?? (values.id ? undefined : process.cwd()) });
+  }
+  if (command === "get") {
+    result = await library.get(args[0], number("revision"));
+    if (values.spec) result = result.spec;
+  }
+  if (command === "history") result = await library.history(args[0], page);
+  if (command === "export") {
+    result = await library.export(args[0], { revision: number("revision"), theme: values.theme,
+      formats: values.format?.split(",").map((f) => f.trim()), scale: values.scale === undefined ? undefined : Number(values.scale),
+      transparent: values.transparent, charset: values.charset, systemFonts: values["system-fonts"] });
+  }
+  process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  return 0;
 }
 
 /**
@@ -153,6 +232,7 @@ async function renderCommand(args, values) {
   if (values.scale && (!Number.isFinite(scale) || scale <= 0)) throw new SpecError([{ path: "--scale", message: "must be a positive number" }]);
   if (values.charset && values.charset !== "unicode" && values.charset !== "ascii") throw new SpecError([{ path: "--charset", message: 'must be "unicode" or "ascii"' }]);
 
+  const { render } = await import("./index.js");
   const result = await render(spec, {
     theme: values.theme,
     formats,

@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Install it from a release tarball or straight from the repository:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
 # or, tracking main:
 npm install github:Krablante/dorpie
 ```
@@ -31,7 +31,7 @@ const { svg, png, ascii } = await render(spec, {
 });
 ```
 
-`render(input, options)` accepts a spec object or a JSON string and returns a promise. Nothing is written to disk; the CLI is what saves files.
+`render(input, options)` accepts a spec object or a JSON string and returns a promise. It writes nothing to disk. For persistent diagrams, source revisions and exports, use `createLibrary` from `dorpie` or the lightweight `dorpie/library` entrypoint; see [library.md](./library.md).
 
 | Option | Type | Default | Meaning |
 | --- | --- | --- | --- |

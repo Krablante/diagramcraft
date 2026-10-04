@@ -8,7 +8,7 @@ This page is written for AI agents and for people who configure them. Everything
 
 ```sh
 # global install from the release tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.2.1/dorpie-0.2.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
 
 # or run straight from a checkout, no install
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -102,4 +102,4 @@ const { svg, png, ascii } = await render(spec, {
 });
 ```
 
-`render` never writes files. The CLI only adds IO around it. The full surface — options, result fields, errors and lower-level exports — is in [api.md](./api.md).
+`render` never writes files. The CLI adds IO around it. For work that must survive another session, use the shared library and plugin's list/get/save/history/export tools. Get the spec schema from `dorpie_help`, save JSON, export, inspect the PNG, and save revisions with the exact `expectedRevision`. See [plugin.md](./plugin.md) and [library.md](./library.md). The rendering API is in [api.md](./api.md).
