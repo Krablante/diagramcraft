@@ -1,7 +1,7 @@
 // SVG renderer: geometry model + theme -> self-contained SVG string.
 // @ts-check
-import { blockHeight, measureText, widestLine } from "./text.js";
-import { deepMerge, escapeXml, hashString, round, slug } from "./util.js";
+import { blockHeight, widestLine } from "./text.js";
+import { deepMerge, escapeXml, round } from "./util.js";
 import { shapePath } from "./shapes.js";
 
 /** @typedef {import("./types.js").Spec} Spec */
@@ -31,7 +31,7 @@ export function renderSvg(model, theme, spec, options = {}) {
 
   /** @param {Paint} paint @returns {string} */
   const paintValue = (paint) => {
-    if (!paint || paint.type === "solid" || !paint.type) return paint?.color ?? "none";
+    if (!paint || paint.type === "solid" || !paint.type) return escapeXml(paint?.color ?? "none");
     const key = JSON.stringify(paint);
     return `url(#${define(key, (id) => gradientBody(paint, id))})`;
   };
@@ -39,7 +39,7 @@ export function renderSvg(model, theme, spec, options = {}) {
   /** @param {Paint} paint */
   function gradientBody(paint, id) {
     const stops = (paint.stops ?? [])
-      .map(([offset, color]) => `<stop offset="${round(offset, 3)}" stop-color="${color}"/>`)
+      .map(([offset, color]) => `<stop offset="${round(offset, 3)}" stop-color="${escapeXml(color)}"/>`)
       .join("");
     if (paint.type === "radial") {
       const [cx, cy] = paint.center ?? [0.5, 0.5];
@@ -61,15 +61,15 @@ export function renderSvg(model, theme, spec, options = {}) {
     const parts = [];
     const merges = [];
     if (shadow) {
-      parts.push(`<feGaussianBlur in="SourceAlpha" stdDeviation="${shadow.blur}" result="shadowBlur"/>`);
-      parts.push(`<feOffset in="shadowBlur" dx="${shadow.x ?? 0}" dy="${shadow.y}" result="shadowOffset"/>`);
-      parts.push(`<feFlood flood-color="${shadow.color}" flood-opacity="${shadow.opacity}" result="shadowColor"/>`);
+      parts.push(`<feGaussianBlur in="SourceAlpha" stdDeviation="${round(shadow.blur)}" result="shadowBlur"/>`);
+      parts.push(`<feOffset in="shadowBlur" dx="${round(shadow.x ?? 0)}" dy="${round(shadow.y)}" result="shadowOffset"/>`);
+      parts.push(`<feFlood flood-color="${escapeXml(shadow.color)}" flood-opacity="${round(shadow.opacity)}" result="shadowColor"/>`);
       parts.push(`<feComposite in="shadowColor" in2="shadowOffset" operator="in" result="shadowOut"/>`);
       merges.push(`<feMergeNode in="shadowOut"/>`);
     }
     if (glow) {
-      parts.push(`<feGaussianBlur in="SourceAlpha" stdDeviation="${glow.blur}" result="glowBlur"/>`);
-      parts.push(`<feFlood flood-color="${glow.color}" flood-opacity="${glow.opacity ?? 0.6}" result="glowColor"/>`);
+      parts.push(`<feGaussianBlur in="SourceAlpha" stdDeviation="${round(glow.blur)}" result="glowBlur"/>`);
+      parts.push(`<feFlood flood-color="${escapeXml(glow.color)}" flood-opacity="${round(glow.opacity ?? 0.6)}" result="glowColor"/>`);
       parts.push(`<feComposite in="glowColor" in2="glowBlur" operator="in" result="glowOut"/>`);
       merges.push(`<feMergeNode in="glowOut"/>`);
     }
@@ -86,9 +86,10 @@ export function renderSvg(model, theme, spec, options = {}) {
   const footerLines = spec.footer ? wrapNo(spec.footer) : [];
 
   const titleWidth = Math.max(titleLines.length ? widestLine(titleLines, titleFont) : 0, subtitleLines.length ? widestLine(subtitleLines, subtitleFont) : 0);
-  const contentWidth = Math.max(model.width, theme.canvas.minWidth, titleWidth);
+  const contentWidth = Math.max(model.width, theme.canvas.minWidth, titleWidth, widestLine(footerLines, footerFont));
   const width = Math.ceil(contentWidth + pad * 2);
-  const titleBlockHeight = titleLines.length ? blockHeight(titleLines, titleFont) + (subtitleLines.length ? theme.heading.subtitleGap + blockHeight(subtitleLines, subtitleFont) : 0) + theme.heading.gap : 0;
+  const ruleHeight = titleLines.length && theme.heading.rule ? (theme.heading.rule.gap ?? 8) + (theme.heading.rule.width ?? 3) : 0;
+  const titleBlockHeight = titleLines.length || subtitleLines.length ? blockHeight(titleLines, titleFont) + ruleHeight + (subtitleLines.length ? (titleLines.length ? theme.heading.subtitleGap : 0) + blockHeight(subtitleLines, subtitleFont) : 0) + theme.heading.gap : 0;
   const footerBlockHeight = footerLines.length ? theme.footer.gap + blockHeight(footerLines, footerFont) : 0;
   const height = Math.ceil(titleBlockHeight + model.height + footerBlockHeight + pad * 2);
   const originX = pad;
@@ -106,7 +107,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     for (const blob of theme.canvas.blobs ?? []) {
       const id = define(
         `blob:${JSON.stringify(blob)}`,
-        (defId) => `<radialGradient id="${defId}" cx="${round(blob.cx, 3)}" cy="${round(blob.cy, 3)}" r="${round(blob.r, 3)}"><stop offset="0" stop-color="${blob.color}" stop-opacity="${blob.opacity ?? 1}"/><stop offset="1" stop-color="${blob.color}" stop-opacity="0"/></radialGradient>`,
+        (defId) => `<radialGradient id="${defId}" cx="${round(blob.cx, 3)}" cy="${round(blob.cy, 3)}" r="${round(blob.r, 3)}"><stop offset="0" stop-color="${escapeXml(blob.color)}" stop-opacity="${round(blob.opacity ?? 1)}"/><stop offset="1" stop-color="${escapeXml(blob.color)}" stop-opacity="0"/></radialGradient>`,
       );
       bgLayers.push(`<rect width="${width}" height="${height}" fill="url(#${id})"/>`);
     }
@@ -120,7 +121,7 @@ export function renderSvg(model, theme, spec, options = {}) {
       const v = theme.canvas.vignette;
       const id = define(
         `vignette:${JSON.stringify(v)}`,
-        (defId) => `<radialGradient id="${defId}" cx="0.5" cy="0.5" r="${round(v.size ?? 0.72, 3)}"><stop offset="0.45" stop-color="${v.color}" stop-opacity="0"/><stop offset="1" stop-color="${v.color}" stop-opacity="${v.opacity}"/></radialGradient>`,
+        (defId) => `<radialGradient id="${defId}" cx="0.5" cy="0.5" r="${round(v.size ?? 0.72, 3)}"><stop offset="0.45" stop-color="${escapeXml(v.color)}" stop-opacity="0"/><stop offset="1" stop-color="${escapeXml(v.color)}" stop-opacity="${round(v.opacity)}"/></radialGradient>`,
       );
       bgLayers.push(`<rect width="${width}" height="${height}" fill="url(#${id})"/>`);
     }
@@ -137,17 +138,17 @@ export function renderSvg(model, theme, spec, options = {}) {
   function textureBody(texture, id) {
     if (texture.type === "noise") {
       const frequency = round(0.85 * (texture.scale ?? 1), 3);
-      return `<filter id="${id}f" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="${frequency}" numOctaves="3" seed="${texture.seed ?? 7}" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ${texture.opacity ?? 0.05} 0"/></filter><pattern id="${id}" width="180" height="180" patternUnits="userSpaceOnUse"><rect width="180" height="180" filter="url(#${id}f)"/></pattern>`;
+      return `<filter id="${id}f" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="${frequency}" numOctaves="3" seed="${round(texture.seed ?? 7)}" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ${round(texture.opacity ?? 0.05, 4)} 0"/></filter><pattern id="${id}" width="180" height="180" patternUnits="userSpaceOnUse"><rect width="180" height="180" filter="url(#${id}f)"/></pattern>`;
     }
     if (texture.type === "grid") {
-      const size = texture.size ?? 24;
-      const stroke = texture.color ?? "rgba(0,0,0,0.06)";
-      return `<pattern id="${id}" width="${size}" height="${size}" patternUnits="userSpaceOnUse"><path d="M ${size} 0 H 0 V ${size}" fill="none" stroke="${stroke}" stroke-width="${texture.width ?? 1}"/></pattern>`;
+      const size = round(texture.size ?? 24);
+      const stroke = escapeXml(texture.color ?? "rgba(0,0,0,0.06)");
+      return `<pattern id="${id}" width="${size}" height="${size}" patternUnits="userSpaceOnUse"><path d="M ${size} 0 H 0 V ${size}" fill="none" stroke="${stroke}" stroke-width="${round(texture.width ?? 1)}"/></pattern>`;
     }
     if (texture.type === "dots") {
-      const size = texture.size ?? 22;
-      const stroke = texture.color ?? "rgba(0,0,0,0.12)";
-      const radius = texture.radius ?? 1.1;
+      const size = round(texture.size ?? 22);
+      const stroke = escapeXml(texture.color ?? "rgba(0,0,0,0.12)");
+      const radius = round(texture.radius ?? 1.1);
       return `<pattern id="${id}" width="${size}" height="${size}" patternUnits="userSpaceOnUse"><circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="${stroke}"/></pattern>`;
     }
     throw new Error(`unknown texture type ${JSON.stringify(texture.type)}`);
@@ -158,11 +159,11 @@ export function renderSvg(model, theme, spec, options = {}) {
   for (const zone of model.zones) {
     const stroke = theme.zone.stroke ?? {};
     const zoneFill = zone.color ? { type: "solid", color: zone.color } : theme.zone.fill;
-    const dash = stroke.dash ? ` stroke-dasharray="${stroke.dash.join(" ")}"` : "";
+    const dash = stroke.dash ? ` stroke-dasharray="${escapeXml(stroke.dash.join(" "))}"` : "";
     const zx = zone.x + originX;
     const zy = zone.y + originY;
     layers.push(
-      `<g><rect x="${round(zx)}" y="${round(zy)}" width="${round(zone.w)}" height="${round(zone.h)}" rx="${theme.zone.radius}" fill="${paintValue(zoneFill)}" stroke="${stroke.color ?? "none"}" stroke-width="${stroke.width ?? 0}"${dash}/>`,
+      `<g><rect x="${round(zx)}" y="${round(zy)}" width="${round(zone.w)}" height="${round(zone.h)}" rx="${round(theme.zone.radius)}" fill="${paintValue(zoneFill)}" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"${dash}/>`,
     );
     const label = zoneFont.uppercase ? zone.label.toUpperCase() : zone.label;
     const labelColor = theme.zone.labelColor ?? zoneFont.color;
@@ -205,9 +206,9 @@ export function renderSvg(model, theme, spec, options = {}) {
   for (const edge of model.edges) {
     const kindStyle = theme.edge.kinds?.[edge.kind] ?? {};
     const strokeStyle = deepMerge(theme.edge.stroke, kindStyle);
-    const color = edge.color ?? strokeStyle.color;
-    const dash = strokeStyle.dash ? ` stroke-dasharray="${strokeStyle.dash.join(" ")}"` : "";
-    const arrowColor = theme.edge.arrow.color ?? color;
+    const color = escapeXml(edge.color ?? strokeStyle.color);
+    const dash = strokeStyle.dash ? ` stroke-dasharray="${escapeXml(strokeStyle.dash.join(" "))}"` : "";
+    const arrowColor = escapeXml(edge.color ?? theme.edge.arrow.color ?? strokeStyle.color);
     const arrowKey = `arrow:${theme.edge.arrow.type}:${arrowColor}:${theme.edge.arrow.size}:${strokeStyle.width}`;
     const markerId = theme.edge.arrow.type === "none" ? null : define(arrowKey, (defId) => markerBody(theme.edge.arrow, arrowColor, defId, strokeStyle.width));
     const startMarkerId = edge.arrow === "both" && theme.edge.arrow.type !== "none" ? define(`${arrowKey}:start`, (defId) => markerBody(theme.edge.arrow, arrowColor, defId, strokeStyle.width, true)) : null;
@@ -215,10 +216,10 @@ export function renderSvg(model, theme, spec, options = {}) {
       const last = i === edge.paths.length - 1;
       const points = cleanPoints(edge.paths[i]).map(([x, y]) => [x + originX, y + originY]);
       const d = roundedPath(points, theme.edge.cornerRadius ?? 0);
-      const startMarker = startMarkerId && i === 0 ? ` marker-start="url(#${startMarkerId})"` : "";
+      const startMarker = startMarkerId && i === 0 && kindById.get(edge.from) !== "junction" ? ` marker-start="url(#${startMarkerId})"` : "";
       const intoJunction = kindById.get(edge.to) === "junction";
       const endMarker = edge.arrow !== "none" && last && markerId && !intoJunction ? ` marker-end="url(#${markerId})"` : "";
-      layers.push(`<path d="${d}" fill="none" stroke="${color}" stroke-width="${strokeStyle.width}" stroke-linecap="round" stroke-linejoin="round"${dash}${startMarker}${endMarker}/>`);
+      layers.push(`<path d="${d}" fill="none" stroke="${color}" stroke-width="${round(strokeStyle.width)}" stroke-linecap="round" stroke-linejoin="round"${dash}${startMarker}${endMarker}/>`);
     }
   }
 
@@ -252,7 +253,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     const y = box.y + originY;
     const fill = theme.edge.label.fill;
     const radius = theme.edge.label.radius ?? 4;
-    if (fill && fill !== "none") layers.push(`<rect x="${round(x + 1)}" y="${round(y + 1)}" width="${round(box.w - 2)}" height="${round(box.h - 2)}" rx="${radius}" fill="${fill}"/>`);
+    if (fill && fill !== "none") layers.push(`<rect x="${round(x + 1)}" y="${round(y + 1)}" width="${round(box.w - 2)}" height="${round(box.h - 2)}" rx="${round(radius)}" fill="${escapeXml(fill)}"/>`);
     layers.push(textLine(edge.label, font, x + box.w / 2, y + box.h / 2, "middle"));
   }
 
@@ -261,49 +262,18 @@ export function renderSvg(model, theme, spec, options = {}) {
     const { fill, stroke, textColor } = resolveNodeStyle(node);
     const x = node.x + originX;
     const y = node.y + originY;
-    const dash = stroke.dash ? ` stroke-dasharray="${stroke.dash.join(" ")}"` : "";
-    const common = `fill="${paintValue(fill)}" stroke="${stroke.color ?? "none"}" stroke-width="${stroke.width ?? 0}"${dash}`;
+    const dash = stroke.dash ? ` stroke-dasharray="${escapeXml(stroke.dash.join(" "))}"` : "";
+    const common = `fill="${paintValue(fill)}" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"${dash}`;
     const group = [`<g data-node="${escapeXml(node.id)}">`];
 
-    if (node.kind === "junction") {
-      group.push(`<circle cx="${round(x + node.w / 2)}" cy="${round(y + node.h / 2)}" r="${round(node.w / 2)}" ${common}/>`);
-    } else if (node.kind === "connector") {
-      group.push(`<circle cx="${round(x + node.w / 2)}" cy="${round(y + node.h / 2)}" r="${round(Math.min(node.w, node.h) / 2)}" ${common}/>`);
-    } else if (node.kind === "decision") {
-      const points = [
-        [x + node.w / 2, y],
-        [x + node.w, y + node.h / 2],
-        [x + node.w / 2, y + node.h],
-        [x, y + node.h / 2],
-      ];
-      group.push(`<polygon points="${points.map((p) => p.map((v) => round(v)).join(",")).join(" ")}" ${common}/>`);
-    } else if (node.kind === "data") {
-      const skew = Math.min(18, node.w * 0.14);
-      const points = [
-        [x + skew, y],
-        [x + node.w, y],
-        [x + node.w - skew, y + node.h],
-        [x, y + node.h],
-      ];
-      group.push(`<polygon points="${points.map((p) => p.map((v) => round(v)).join(",")).join(" ")}" ${common}/>`);
-    } else if (node.kind === "document") {
-      const wave = Math.min(12, node.h * 0.18);
-      const d = `M${round(x)},${round(y)} H${round(x + node.w)} V${round(y + node.h - wave)} C${round(x + node.w * 0.72)},${round(y + node.h + wave * 1.6)} ${round(x + node.w * 0.28)},${round(y + node.h - wave * 2.6)} ${round(x)},${round(y + node.h - wave)} Z`;
-      group.push(`<path d="${d}" ${common}/>`);
-    } else if (node.kind === "database") {
+    group.push(shapePath(node.kind, x, y, node.w, node.h, theme, common));
+    if (node.kind === "database") {
       const ry = Math.min(11, node.h * 0.2);
       const cx = x + node.w / 2;
-      const d = `M${round(x)},${round(y + ry)} A${round(node.w / 2)},${round(ry)} 0 0 1 ${round(x + node.w)},${round(y + ry)} V${round(y + node.h - ry)} A${round(node.w / 2)},${round(ry)} 0 0 1 ${round(x)},${round(y + node.h - ry)} Z`;
-      group.push(`<path d="${d}" ${common}/>`);
       group.push(`<ellipse cx="${round(cx)}" cy="${round(y + ry)}" rx="${round(node.w / 2)}" ry="${round(ry)}" ${common}/>`);
     } else if (node.kind === "note") {
       const fold = Math.min(16, node.w * 0.18, node.h * 0.32);
-      const d = `M${round(x)},${round(y)} H${round(x + node.w - fold)} L${round(x + node.w)},${round(y + fold)} V${round(y + node.h)} H${round(x)} Z`;
-      group.push(`<path d="${d}" ${common}/>`);
-      group.push(`<path d="M${round(x + node.w - fold)},${round(y)} V${round(y + fold)} H${round(x + node.w)}" fill="none" stroke="${stroke.color ?? "none"}" stroke-width="${stroke.width ?? 0}"/>`);
-    } else {
-      const radius = node.kind === "terminal" ? node.h / 2 : theme.node.radius;
-      group.push(`<rect x="${round(x)}" y="${round(y)}" width="${round(node.w)}" height="${round(node.h)}" rx="${round(radius)}" ${common}/>`);
+      group.push(`<path d="M${round(x + node.w - fold)},${round(y)} V${round(y + fold)} H${round(x + node.w)}" fill="none" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"/>`);
     }
 
     if (theme.node.shine) {
@@ -315,7 +285,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     const noteFont = theme.fonts.note;
     const noteHeight = node.noteLines.length ? 5 + blockHeight(node.noteLines, noteFont) : 0;
     const totalHeight = blockHeight(node.lines, node.labelFont) + noteHeight;
-    let cursor = y + (node.h - totalHeight) / 2;
+    let cursor = y + (node.h - totalHeight) / 2 + (node.kind === "database" ? Math.min(11, node.h * 0.2) / 2 : 0);
     if (node.kind !== "junction") {
       for (const line of node.lines) {
         group.push(textLine(line, { ...node.labelFont, color: textColor }, x + node.w / 2, cursor + lineHeight / 2, "middle"));
@@ -331,7 +301,7 @@ export function renderSvg(model, theme, spec, options = {}) {
   }
 
   // ---- title and footer ----------------------------------------------------
-  if (titleLines.length) {
+  if (titleLines.length || subtitleLines.length) {
     const align = theme.heading.align ?? "left";
     const x = align === "center" ? width / 2 : align === "right" ? width - pad : pad;
     const anchor = align === "center" ? "middle" : align === "right" ? "end" : "start";
@@ -339,15 +309,15 @@ export function renderSvg(model, theme, spec, options = {}) {
     const titleHeight = blockHeight(titleLines, titleFont);
     for (let i = 0; i < titleLines.length; i++) layers.push(textLine(titleLines[i], titleFont, x, cursor + (i + 0.5) * (titleFont.lineHeight ?? 1.35) * titleFont.size, anchor));
     cursor += titleHeight;
-    if (theme.heading.rule) {
+    if (titleLines.length && theme.heading.rule) {
       const rule = theme.heading.rule;
       cursor += rule.gap ?? 8;
       const ruleX = align === "center" ? x - (rule.length ?? 56) / 2 : align === "right" ? x - (rule.length ?? 56) : x;
-      layers.push(`<rect x="${round(ruleX)}" y="${round(cursor)}" width="${rule.length ?? 56}" height="${rule.width ?? 3}" rx="${(rule.width ?? 3) / 2}" fill="${rule.color}"/>`);
+      layers.push(`<rect x="${round(ruleX)}" y="${round(cursor)}" width="${round(rule.length ?? 56)}" height="${round(rule.width ?? 3)}" rx="${(rule.width ?? 3) / 2}" fill="${escapeXml(rule.color)}"/>`);
       cursor += (rule.width ?? 3);
     }
     if (subtitleLines.length) {
-      cursor += theme.heading.subtitleGap;
+      if (titleLines.length) cursor += theme.heading.subtitleGap;
       const subHeight = blockHeight(subtitleLines, subtitleFont);
       for (let i = 0; i < subtitleLines.length; i++) layers.push(textLine(subtitleLines[i], subtitleFont, x, cursor + (i + 0.5) * (subtitleFont.lineHeight ?? 1.35) * subtitleFont.size, anchor));
       cursor += subHeight;
@@ -386,8 +356,8 @@ export function renderSvg(model, theme, spec, options = {}) {
       `y="${round(y)}"`,
       `font-family="${escapeXml(font.family)}"`,
       `font-size="${round(font.size)}"`,
-      `font-weight="${font.weight ?? 400}"`,
-      `fill="${font.color}"`,
+      `font-weight="${round(font.weight ?? 400)}"`,
+      `fill="${escapeXml(font.color)}"`,
       `text-anchor="${anchor}"`,
       `dominant-baseline="central"`,
     ];

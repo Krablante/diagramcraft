@@ -8,6 +8,7 @@ import { defaultPaths, LibraryError } from "./config.js";
  * @param {{app?:string, configDir?:string}} [options]
  */
 export async function installPlugin(options = {}) {
+  if (options.configDir !== undefined && (typeof options.configDir !== "string" || !options.configDir.trim())) throw new LibraryError("configDir must be a nonempty path");
   const app = options.app ?? "opencodez";
   if (!["opencode", "opencodez"].includes(app)) throw new LibraryError("app must be opencode or opencodez");
   const configDir = options.configDir ? resolve(options.configDir) : join(defaultPaths().configHome, app);

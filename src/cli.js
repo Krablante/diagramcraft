@@ -103,6 +103,15 @@ export async function run(argv) {
       process.stdout.write(`${pkg.version}\n`);
       return 0;
     }
+    const commandOptions = {
+      render: ["theme", "format", "out", "scale", "transparent", "system-fonts", "charset", "quiet"],
+      validate: ["json"], themes: ["json"], schema: [], init: ["force"],
+    };
+    if (Object.hasOwn(commandOptions, command)) {
+      for (const key of Object.keys(values)) if (!commandOptions[command].includes(key)) throw new LibraryError(`--${key} is not supported by ${command}`);
+      const maxArgs = command === "schema" ? 0 : 1;
+      if (positionals.length - 1 > maxArgs) throw new LibraryError(`Unexpected arguments for ${command}`);
+    }
     if (command === "render") return await renderCommand(positionals.slice(1), values);
     if (command === "validate") return validateCommand(positionals.slice(1), values);
     if (command === "themes") return themesCommand(positionals.slice(1), values);
@@ -116,6 +125,10 @@ export async function run(argv) {
     return 2;
   } catch (error) {
     if (error instanceof SpecError) {
+      if (command === "validate" && values.json) {
+        process.stdout.write(`${JSON.stringify({ ok: false, issues: error.issues })}\n`);
+        return 2;
+      }
       process.stderr.write(`spec error: ${error.issues.length} problem${error.issues.length === 1 ? "" : "s"}\n`);
       for (const issue of error.issues) process.stderr.write(`  ${issue.path}: ${issue.message}\n`);
       return 2;
@@ -217,21 +230,29 @@ async function renderCommand(args, values) {
   const spec = parseInput(text, path);
 
   /** @type {Array<"svg"|"png"|"ascii">} */
-  const formats = /** @type {any} */ (
-    values.format
+  const formats = /** @type {any} */ ([...new Set(
+    values.format !== undefined
       ? String(values.format)
           .split(",")
           .map((f) => f.trim())
-          .filter(Boolean)
       : spec.output?.formats ?? ["svg"]
-  );
+  )]);
+  if (!formats.length) throw new SpecError([{ path: "--format", message: "must contain svg, png and/or ascii" }]);
   for (const format of formats) {
     if (!["svg", "png", "ascii"].includes(format)) throw new SpecError([{ path: "--format", message: `unknown format ${JSON.stringify(format)}; expected svg, png or ascii` }]);
   }
-  const scale = values.scale ? Number(values.scale) : undefined;
-  if (values.scale && (!Number.isFinite(scale) || scale <= 0)) throw new SpecError([{ path: "--scale", message: "must be a positive number" }]);
+  const scale = values.scale !== undefined ? Number(values.scale) : undefined;
+  if (values.scale !== undefined && (!Number.isFinite(scale) || scale <= 0)) throw new SpecError([{ path: "--scale", message: "must be a positive number" }]);
   if (values.charset && values.charset !== "unicode" && values.charset !== "ascii") throw new SpecError([{ path: "--charset", message: 'must be "unicode" or "ascii"' }]);
 
+  const targets = resolveOutputs(path, values.out, formats);
+  if (path) {
+    const source = statSync(path);
+    for (const target of targets.values()) {
+      const output = target && existsSync(target) ? statSync(target) : null;
+      if (target === path || (output && output.dev === source.dev && output.ino === source.ino)) throw new SpecError([{ path: "--out", message: "output must not overwrite the input spec" }]);
+    }
+  }
   const { render } = await import("./index.js");
   const result = await render(spec, {
     theme: values.theme,
@@ -242,7 +263,6 @@ async function renderCommand(args, values) {
     charset: values.charset,
   });
 
-  const targets = resolveOutputs(path, values.out, formats);
   for (const format of formats) {
     const target = targets.get(format);
     const data = format === "svg" ? result.svg : format === "ascii" ? result.ascii : result.png;
@@ -265,6 +285,7 @@ async function renderCommand(args, values) {
  * @returns {Map<string,string|null>}
  */
 function resolveOutputs(inputPath, out, formats) {
+  if (out !== undefined && !out.trim()) throw new SpecError([{ path: "--out", message: "must be a nonempty path or -" }]);
   const base = inputPath ? basename(inputPath, extname(inputPath)) : "diagram";
   const extension = { svg: "svg", png: "png", ascii: "txt" };
   /** @type {Map<string,string|null>} */
@@ -363,7 +384,8 @@ function initCommand(args, values) {
       { from: "render", to: "end" },
     ],
   };
-  writeFileSync(file, `${JSON.stringify(spec, null, 2)}\n`);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, `${JSON.stringify(spec, null, 2)}\n`, { flag: values.force ? "w" : "wx" });
   process.stdout.write(`${file}\n`);
   return 0;
 }

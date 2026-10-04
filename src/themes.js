@@ -52,11 +52,23 @@ function init() {
  */
 export function mergeTheme(raw) {
   init();
-  if (!raw || typeof raw !== "object") throw new ThemeError("theme must be a JSON object");
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new ThemeError("theme must be a JSON object");
   if (typeof raw.id !== "string" || !raw.id.trim()) throw new ThemeError("theme.id must be a non-empty string");
   if (typeof raw.title !== "string" || !raw.title.trim()) throw new ThemeError(`theme ${raw.id}: title must be a non-empty string`);
   const theme = /** @type {Theme} */ (deepMerge(base, raw));
-  if (!theme.fonts?.node?.family) throw new ThemeError(`theme ${raw.id}: fonts.node.family is required`);
+  for (const section of ["canvas", "fonts", "node", "edge", "zone", "heading", "footer", "layout"]) {
+    if (!theme[section] || typeof theme[section] !== "object" || Array.isArray(theme[section])) throw new ThemeError(`theme ${raw.id}: ${section} must be an object`);
+  }
+  for (const role of Object.keys(base.fonts)) {
+    const font = theme.fonts[role];
+    if (!font || typeof font.family !== "string" || !font.family.trim()) throw new ThemeError(`theme ${raw.id}: fonts.${role}.family must be a nonempty string`);
+    if (!Number.isFinite(font.size) || font.size <= 0) throw new ThemeError(`theme ${raw.id}: fonts.${role}.size must be a positive number`);
+    if (font.lineHeight !== undefined && (!Number.isFinite(font.lineHeight) || font.lineHeight <= 0)) throw new ThemeError(`theme ${raw.id}: fonts.${role}.lineHeight must be a positive number`);
+    if (font.spacing !== undefined && !Number.isFinite(font.spacing)) throw new ThemeError(`theme ${raw.id}: fonts.${role}.spacing must be a finite number`);
+  }
+  for (const [section, keys] of Object.entries({ canvas: ["padding", "minWidth"], node: ["minWidth", "maxTextWidth", "padX", "padY"], layout: ["nodeGap", "rankGap", "edgeGap"] })) {
+    for (const key of keys) if (!Number.isFinite(theme[section][key]) || theme[section][key] < 0 || (key === "maxTextWidth" && theme[section][key] === 0)) throw new ThemeError(`theme ${raw.id}: ${section}.${key} must be ${key === "maxTextWidth" ? "positive" : "nonnegative"}`);
+  }
   return theme;
 }
 
@@ -95,18 +107,4 @@ export function loadThemeFile(path) {
   const absolute = resolve(path);
   if (!existsSync(absolute)) throw new ThemeError(`theme file not found: ${absolute}`);
   return mergeTheme(loadJson(absolute));
-}
-
-/**
- * Resolve the theme a spec asks for, including per-spec style overrides.
- * A theme value that ends in .json or contains a path separator is treated as
- * a file path; anything else must be a built-in theme id.
- * @param {{theme:string, style?:object|null}} spec
- * @returns {Theme}
- */
-export function themeForSpec(spec) {
-  const requested = spec.theme ?? "classic";
-  const isPath = requested.endsWith(".json") || requested.includes("/") || requested.includes("\\");
-  const theme = isPath ? loadThemeFile(requested) : getTheme(requested);
-  return spec.style ? /** @type {Theme} */ (deepMerge(theme, spec.style)) : theme;
 }

@@ -1,12 +1,12 @@
 // Dorpie public API. This is the primary interface: render a spec
 // object to SVG, PNG and ASCII without touching the CLI.
 // @ts-check
-import { parseSpec } from "./spec.js";
+import { parseSpec, SpecError } from "./spec.js";
 import { layoutSpec } from "./layout.js";
 import { renderSvg } from "./svg.js";
 import { renderAscii } from "./ascii.js";
 import { svgToPng } from "./png.js";
-import { getTheme, loadThemeFile, listThemes, themeForSpec } from "./themes.js";
+import { getTheme, loadThemeFile, mergeTheme } from "./themes.js";
 import { deepMerge } from "./util.js";
 
 export { parseSpec, SpecError } from "./spec.js";
@@ -34,16 +34,21 @@ export { createLibrary, resolveConfig, LibraryError } from "./library.js";
 export async function render(input, options = {}) {
   const raw = typeof input === "string" ? JSON.parse(input) : input;
   const spec = parseSpec(raw);
+  const issue = (/** @type {string} */ path, /** @type {string} */ message) => { throw new SpecError([{ path, message }]); };
+  if (options.formats !== undefined && (!Array.isArray(options.formats) || options.formats.some((f) => !["svg", "png", "ascii"].includes(f)))) issue("formats", "expected an array of svg, png and/or ascii");
+  if (options.scale !== undefined && (!Number.isFinite(options.scale) || options.scale <= 0)) issue("scale", "must be a positive number");
+  if (options.charset !== undefined && !["unicode", "ascii"].includes(options.charset)) issue("charset", "must be unicode or ascii");
+  for (const key of ["transparent", "systemFonts"]) if (options[key] !== undefined && typeof options[key] !== "boolean") issue(key, "must be a boolean");
 
   /** @type {import("./types.js").Theme} */
   let theme;
-  if (options.theme && typeof options.theme === "object") theme = /** @type {any} */ (options.theme);
-  else if (typeof options.theme === "string" && options.theme !== spec.theme) {
-    const requested = options.theme;
+  if (options.theme && typeof options.theme === "object") theme = mergeTheme(options.theme);
+  else {
+    const requested = options.theme ?? spec.theme;
     const isPath = requested.endsWith(".json") || requested.includes("/") || requested.includes("\\");
     theme = isPath ? loadThemeFile(requested) : getTheme(requested);
-  } else theme = themeForSpec(spec);
-  if (spec.style) theme = /** @type {any} */ (deepMerge(theme, spec.style));
+  }
+  if (spec.style) theme = mergeTheme(deepMerge(theme, spec.style));
 
   const model = await layoutSpec(spec, theme);
   const formats = options.formats?.length ? options.formats : spec.output?.formats ?? ["svg"];

@@ -69,6 +69,7 @@ export async function renderAscii(spec, theme, options = {}) {
   const overlay = new Map();
   /** @type {Map<string,{x0:number,y0:number,x1:number,y1:number}>} */
   const boxes = new Map();
+  const kindById = new Map(spec.nodes.map((node) => [node.id, node.kind]));
 
   const key = (/** @type {number} */ x, /** @type {number} */ y) => `${x},${y}`;
 
@@ -148,10 +149,11 @@ export async function renderAscii(spec, theme, options = {}) {
     cells.push(end);
 
     for (let i = 0; i < cells.length - 1; i++) stampSegment(cells[i], cells[i + 1], bits, frame);
-    if (edge.arrow !== "none") {
+    if (edge.arrow !== "none" && kindById.get(edge.to) !== "junction") {
       const beforeEnd = cells[cells.length - 2] ?? cells[0];
       overlay.set(key(end[0], end[1]), arrowGlyph(beforeEnd, end));
     }
+    if (edge.arrow === "both" && kindById.get(edge.from) !== "junction") overlay.set(key(start[0], start[1]), arrowGlyph(cells[1], start));
   }
 
   // ---- edge labels ---------------------------------------------------------
@@ -159,16 +161,15 @@ export async function renderAscii(spec, theme, options = {}) {
     if (!edge.label || !edge.labelBox) continue;
     const cx = Math.round((edge.labelBox.x + edge.labelBox.w / 2) / CELL_W);
     const cy = Math.round((edge.labelBox.y + edge.labelBox.h / 2) / CELL_H);
-    putText(overlay, cx - Math.floor((edge.label.length + 2) / 2), cy, ` ${edge.label} `, true);
+    putText(overlay, cx - Math.floor((displayWidth(edge.label) + 2) / 2), cy, ` ${edge.label} `, true);
   }
 
   // ---- assemble ------------------------------------------------------------
-  const cells = new Set([...frame.keys(), ...bits.keys(), ...overlay.keys()]);
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
-  for (const cell of cells) {
+  for (const layer of [frame, bits, overlay]) for (const cell of layer.keys()) {
     const [x, y] = cell.split(",").map(Number);
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
@@ -182,7 +183,9 @@ export async function renderAscii(spec, theme, options = {}) {
     let line = "";
     for (let x = minX; x <= maxX; x++) {
       const k = key(x, y);
-      line += frame.get(k) ?? overlay.get(k) ?? GLYPHS[bits.get(k) ?? 0] ?? " ";
+      const ch = frame.get(k) ?? overlay.get(k) ?? GLYPHS[bits.get(k) ?? 0] ?? " ";
+      line += ch;
+      if (isWide(ch)) x += 1;
     }
     rows.push(line.replace(/\s+$/, ""));
   }
@@ -194,7 +197,7 @@ export async function renderAscii(spec, theme, options = {}) {
   if (spec.footer) rows.push("", spec.footer);
 
   let text = [...header, ...rows].join("\n");
-  if (options.charset === "ascii") text = text.replace(/[^\x00-\x7F]/g, (ch) => ASCII_MAP[ch] ?? "?");
+  if (options.charset === "ascii") text = text.replace(/[╭╮╰╯┌┐└┘─│═║╔╗╚╝├┤┬┴┼╱╲▶◀▼▲●]/g, (ch) => ASCII_MAP[ch]);
   return `${text}\n`;
 }
 
@@ -308,7 +311,7 @@ function putText(target, x, y, text, overwrite = false) {
   let cursor = x;
   for (const ch of text) {
     if (ch !== " " && (overwrite || !target.has(`${cursor},${y}`))) target.set(`${cursor},${y}`, ch);
-    cursor += 1;
+    cursor += isWide(ch) ? 2 : 1;
   }
 }
 

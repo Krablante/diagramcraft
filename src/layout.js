@@ -28,8 +28,11 @@ function sizeNode(node, theme) {
 
   if (node.kind === "junction" || node.kind === "connector") {
     const size = node.width ?? kind.size ?? (node.kind === "junction" ? 12 : 44);
-    const height = node.height ?? size;
-    return { lines: [], noteLines: [], labelFont: nodeFont, w: node.width ?? size, h: height };
+    const lines = node.kind === "connector" ? wrapText(node.label, nodeFont, node.maxWidth ?? theme.node.maxTextWidth) : [];
+    const noteLines = node.kind === "connector" && node.note ? wrapText(node.note, noteFont, node.maxWidth ?? theme.node.maxTextWidth) : [];
+    const diameter = node.kind === "junction" ? size : Math.max(size, widestLine(lines, nodeFont) + 16, widestLine(noteLines, noteFont) + 16,
+      blockHeight(lines, nodeFont) + blockHeight(noteLines, noteFont) + (noteLines.length ? 5 : 0) + 16);
+    return { lines, noteLines, labelFont: nodeFont, w: node.width ?? diameter, h: node.height ?? diameter };
   }
 
   const maxTextWidth = node.maxWidth ?? theme.node.maxTextWidth;
@@ -42,6 +45,7 @@ function sizeNode(node, theme) {
   if (node.kind === "data") w = Math.round(w * 1.14);
   let h = padY * 2 + blockHeight(lines, nodeFont) + (noteLines.length ? 5 + blockHeight(noteLines, noteFont) : 0);
   if (node.kind === "decision") h = Math.round(h * 1.16);
+  if (node.kind === "database") h += 22; // Keep text below the cylinder's top cap.
 
   return {
     lines,
@@ -137,8 +141,9 @@ export async function layoutSpec(spec, theme, options = {}) {
 
   /** @type {import("./types.js").ModelEdge[]} */
   const edgesOut = [];
+  const edgeById = new Map(spec.edges.map((edge) => [edge.id, edge]));
   for (const elkEdge of result.edges ?? []) {
-    const specEdge = spec.edges.find((candidate) => candidate.id === elkEdge.id);
+    const specEdge = edgeById.get(elkEdge.id);
     if (!specEdge) continue;
     /** @type {number[][][]} */
     const paths = (elkEdge.sections ?? []).map((section) => [
@@ -170,7 +175,7 @@ export async function layoutSpec(spec, theme, options = {}) {
       const members = group.nodes.map((id) => nodeById.get(id)).filter(Boolean);
       if (!members.length) return null;
       const labelText = zoneLabelFont.uppercase ? group.label.toUpperCase() : group.label;
-      const labelWidth = measureText(labelText, zoneLabelFont) + (zoneLabelFont.spacing ?? 0) * labelText.length;
+      const labelWidth = measureText(labelText, zoneLabelFont);
       const padX = theme.zone.pad;
       const padY = theme.zone.padY ?? Math.max(8, Math.round(padX * 0.5));
       const gutter = Math.max(padX, Math.ceil(labelWidth) + theme.zone.labelPad + 6);
@@ -184,10 +189,9 @@ export async function layoutSpec(spec, theme, options = {}) {
 
   // Snap edge endpoints to the real shape borders so arrowheads land on the
   // outline rather than on the rectangular layout box.
-  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
   for (const edge of edgesOut) {
-    const source = nodeMap.get(edge.from);
-    const target = nodeMap.get(edge.to);
+    const source = nodeById.get(edge.from);
+    const target = nodeById.get(edge.to);
     if (!source || !target) continue;
     for (let i = 0; i < edge.paths.length; i++) {
       const path = edge.paths[i];

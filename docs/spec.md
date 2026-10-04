@@ -53,6 +53,8 @@ A `theme` value that ends in `.json` or contains a path separator (`/` or `\`) i
 
 Unknown fields are rejected, and the error path points at the typo (`nodes[0].lable: unknown field "lable"`). The same applies to every nested object below.
 
+Optional text, node dimensions, kind/arrow values and optional top-level sections accept `null` as absence, so normalized saved specs remain valid against the published schema. `accent` and `output.transparent` must be booleans when present; spacing values inside `layout` must be positive numbers. The validator also checks graph relationships that JSON Schema cannot express: unique IDs, existing endpoints, group membership and self-loops.
+
 ## Nodes
 
 | Field | Type | Default | Meaning |
@@ -152,7 +154,7 @@ spec error: 4 problems
   output.formats: unknown format "jpeg"; expected svg, png or ascii
 ```
 
-`dorpie validate spec.json --json` prints a machine-readable `{ "ok": true, ... }` summary for valid specs. Exit codes: `0` success, `2` invalid spec or arguments, `1` runtime failure.
+`dorpie validate spec.json --json` prints `{ "ok": true, ... }` for valid specs or `{ "ok": false, "issues": [...] }` with paths and messages for invalid specs. Exit codes: `0` success, `2` invalid spec or arguments, `1` runtime failure.
 
 ## Readability tips
 

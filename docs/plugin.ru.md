@@ -9,7 +9,7 @@ Dorpie — один пакет: CLI, Node-библиотека и плагин �
 Для CLI нужен Node 20+. Установите релиз и подключите плагин:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 dorpie plugin install --app opencodez
 # Для upstream OpenCode:
 # dorpie plugin install --app opencode
@@ -23,7 +23,7 @@ dorpie plugin install --app opencodez
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz"
+    "https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz"
   ]
 }
 ```
@@ -52,7 +52,7 @@ dorpie plugin install --app opencodez
 ```json
 {
   "plugin": [[
-    "https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz",
+    "https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz",
     { "libraryDir": "~/diagrams/library", "exportDir": "~/diagrams/exports" }
   ]]
 }

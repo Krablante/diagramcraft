@@ -4,6 +4,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] - 2026-10-04
+
+- Restore connector labels, wrap long words at the requested width, account for letter spacing, and reserve heading rules, standalone subtitles and long footers correctly.
+- Use one set of shape outlines for nodes, shadows and highlights; fix database silhouettes and keep database text below the top cap.
+- Draw both ASCII arrowheads, suppress arrows into junctions, align wide text, and preserve user labels when ASCII frame characters are requested.
+- Escape SVG paint attributes and keep deep merges from changing object prototypes. Validate rendering options and essential theme dimensions before layout.
+- Reject ignored CLI options, extra arguments, empty formats and outputs that overwrite their input. Validate output destinations before rendering; return structured spec failures with `validate --json`.
+- Align the JSON Schema with normalized saved specs and case-insensitive directions; reject null boolean switches and coerced array enums.
+- Replace per-edge linear searches with an ID map, remove redundant theme merging and history reads, and reduce ASCII/text allocation and repeated measurement.
+- Ship the complete linked documentation and gallery, include future language files automatically, and clarify architecture, storage costs, backups and release delivery in English and Russian.
+
 ## [0.3.0] - 2026-10-04
 
 - One package now includes an OpenCode/OpenCodez plugin with six agent tools and PNG attachments. `dorpie plugin install` connects it without rewriting user configuration.

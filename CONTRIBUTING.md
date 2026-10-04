@@ -7,9 +7,9 @@ Thanks for taking a look. The project is small on purpose: a plain ESM package w
 ```sh
 git clone https://github.com/Krablante/dorpie
 cd dorpie
-npm install
+npm ci
 npm run check
-node bin/dorpie.js render examples/quickstart.json --format svg,png,ascii
+node bin/dorpie.js render examples/quickstart.json --format svg,png,ascii --out /tmp/dorpie-preview/
 ```
 
 Node 20 or newer is required; CI runs the checks on Node 20, 22 and 24.
@@ -29,9 +29,9 @@ Node 20 or newer is required; CI runs the checks on Node 20, 22 and 24.
 The pipeline is deliberately linear:
 
 ```
-spec JSON ─▶ parseSpec ─▶ theme resolution ─▶ layoutSpec (ELK) ─▶ renderSvg ─▶ SVG
-                                                                 └▶ renderAscii ─▶ character grid
-                                             renderSvg ─▶ svgToPng ─▶ PNG
+spec JSON → validation + theme → pixel layout (ELK) → SVG → PNG (resvg)
+                              → cell layout (ELK)  → ASCII
+CLI / plugin → library → immutable revisions + preserved exports → renderer
 ```
 
 | File | Responsibility |
@@ -40,8 +40,9 @@ spec JSON ─▶ parseSpec ─▶ theme resolution ─▶ layoutSpec (ELK) ─�
 | `src/themes.js` | Load built-in themes and theme files, merge overrides. |
 | `src/text.js` | Text measurement and wrapping against bundled font metrics. |
 | `src/layout.js` | Spec + theme to geometry via ELK; zones and normalization. |
+| `src/shapes.js` | Shared shape outlines and border geometry for drawing and edge snapping. |
 | `src/svg.js` | Geometry to SVG; the only place that knows how tokens become paint. |
-| `src/ascii.js` | Geometry to an ASCII/Unicode character grid. |
+| `src/ascii.js` | Spec to an ASCII/Unicode grid through a separate cell layout. |
 | `src/png.js` | SVG to PNG with resvg and the bundled fonts. |
 | `src/index.js` | Public API (`render`, `parseSpec`, theme helpers). |
 | `src/cli.js` | Argument parsing, file IO and exit codes only. |
@@ -55,7 +56,7 @@ Invariants to preserve:
 - **No build step, no hidden runtime.** Plain ESM with renderer dependencies `elkjs`, `@resvg/resvg-js` and plugin argument schemas from `zod`. Do not add a bundler or transpiler.
 - **Deterministic output.** The same spec and theme must produce byte-identical SVG. Bundled fonts stay in `assets/fonts/` with their OFL licenses and are regenerated via `npm run metrics`.
 - **PNG is local.** No browser, no network, no system fonts by default.
-- **ASCII and SVG use separate layouts** (character cell space vs pixels); both render from the same spec and model.
+- **ASCII and SVG use separate layouts** (character cell space vs pixels); both render from the same spec with the same layout engine.
 
 ## Making changes
 
@@ -64,7 +65,13 @@ Invariants to preserve:
 - **CLI:** update `src/cli.js`, its `HELP` text and `docs/cli.md` + `docs/cli.ru.md`, and keep `test/cli.test.js` covering the command.
 - **Library/plugin:** keep shared behavior in `src/library.js`; plugin and CLI are adapters. `test/library.test.js` covers persistence, conflicts, exports, permissions and installation. Update `docs/library*` and `docs/plugin*` together. Keep immutable source revisions separate from derived exports.
 - **Examples:** `examples/` doubles as documentation and test fixtures; keep every file valid and representative. `scripts/gallery.mjs` renders them into `docs/gallery`.
-- **Documentation:** English and Russian versions are maintained together with the same structure and content. Each page links to its counterpart.
+- **Documentation:** update the affected pages in every supported language; see the convention below.
+
+## Documentation
+
+English uses the base filename (`README.md`, `docs/cli.md`); translations insert a language code before `.md` (`README.ru.md`, `docs/cli.ru.md`). English and Russian are the current languages. Add Ukrainian as `.uk.md`, German as `.de.md`, or another language the same way. Add its link to every page's language switcher and keep links inside that translation pointing to translated pages. The package allowlist includes new language files automatically.
+
+Keep the same categories and heading order in every language, with natural wording in each. Update meaning together when behavior changes. Shared examples, schemas and gallery images stay in one place. Installation starts in the README; CLI details belong in `docs/cli`, storage and configuration in `docs/library`, plugin setup in `docs/plugin`, spec/theme/API references in their own pages, agent usage in `docs/agents`, and development and release procedures here. Link to the owner of a topic instead of repeating its full reference.
 
 ## Adding a theme
 
@@ -81,9 +88,9 @@ Keep the change focused; include what changed and how it was verified (commands 
 
 ## Releases
 
-1. Update `CHANGELOG.md` + `CHANGELOG.ru.md` and the version in `package.json`.
-2. Point the install commands in `README.md` + `README.ru.md`, and the setup snippets in `docs/agents.md` + `docs/agents.ru.md`, at the new version.
+1. Run `npm version X.Y.Z --no-git-tag-version` to update `package.json` and the lockfile. Update all changelog translations.
+2. Update versioned install URLs in the READMEs and agent, plugin and API guides in every language.
 3. `npm run check`, `npm pack --dry-run`, then install the packed tarball in a scratch prefix and render an example.
 4. `npm run gallery`, commit, tag `vX.Y.Z`, push.
-5. Create the GitHub release with notes and attach the tarball produced by `npm pack` (the filename is what the README install command expects).
+5. Create the GitHub release with notes and attach the tarball produced by `npm pack` plus `SHA256SUMS` (`sha256sum dorpie-X.Y.Z.tgz > SHA256SUMS`). Keep packaging artifacts outside the checkout. Install that exact artifact wherever a deployed runtime is maintained, then verify the CLI and reload the consuming backend.
 6. `npm publish --access public` only with a valid npm token; publishing is not currently configured, so the GitHub release is the distribution channel.

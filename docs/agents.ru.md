@@ -8,7 +8,7 @@
 
 ```sh
 # глобальная установка из релизного tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 
 # или запуск прямо из репозитория, без установки
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -28,7 +28,7 @@ dorpie themes             # id и описания тем
    dorpie validate spec.json --json   # для машины
    ```
    Код возврата `2` означает, что спека некорректна; каждая проблема выводится с JSON-путём.
-3. **Отрендерить.** SVG дешёвый, ASCII — самый дешёвый, PNG — для пользователя.
+3. **Отрендерить.** SVG даёт вектор, ASCII — вид в терминале, PNG — картинку для просмотра.
    ```sh
    dorpie render spec.json --format svg,ascii --out out/
    dorpie render spec.json --format png --scale 2 --out out/diagram.png
@@ -87,7 +87,7 @@ dorpie themes             # id и описания тем
 | подпись у junction | `nodes[3].label: junction nodes do not render a label` |
 | опечатка в имени поля | `nodes[0].lable: unknown field "lable"` |
 | длинные подписи | узлы становятся широкими, раскладка — высокой; переносите через `\n` или сокращайте |
-| группы как контейнеры раскладки | узлы могут оказаться вне зоны, если поток разъехался; управляйте потоком через `direction` и порядок узлов |
+| группы как контейнеры раскладки | посторонние узлы могут попасть внутрь зоны участников; группы не задают позиции, управляйте потоком через `direction` и порядок узлов |
 
 ## Программное использование
 

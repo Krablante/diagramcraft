@@ -1,8 +1,7 @@
 <h1 align="center">Dorpie</h1>
 
-<p align="center"><strong>Diagrams from one JSON file.</strong><br>
-Seven complete visual themes, three output formats, no browser and no GUI.<br>
-Built for AI agents, pleasant for humans.</p>
+<p align="center"><strong>Write JSON. Get a diagram. Reopen it next session.</strong><br>
+Seven visual themes · SVG, PNG and ASCII · CLI, Node API and OpenCode tools</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
@@ -14,14 +13,14 @@ Built for AI agents, pleasant for humans.</p>
 
 Dorpie is a CLI, Node library and OpenCode/OpenCodez plugin that renders a JSON diagram spec into SVG, PNG and ASCII. The spec is the source of truth: you describe nodes and edges once and render every format from them, so “add one more block” stays a two-line edit instead of a redraw. Saved diagrams keep source revisions and export history across agent sessions.
 
-Everything runs locally in Node — no headless browser, no network calls while rendering, no accounts. A typical diagram renders in well under a second. Each theme is a complete visual system with its own typography, shapes, line work, background and composition, not the same picture recoloured.
+Everything runs locally in Node — no headless browser, no network calls while rendering, no accounts. Use it for a runbook, an architecture sketch, a release flow or a diagram an agent will revise later. Each theme sets typography, shapes, lines and background together.
 
 ## Install
 
 Node 20 or newer. The package ships as a tarball attached to GitHub releases:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 dorpie --version
 ```
 
@@ -126,27 +125,6 @@ The full API reference is in [docs/api.md](./docs/api.md).
 - `examples/transformer-block.json` — a residual transformer block with junction merges (Glass)
 - `examples/node-shapes.json` — every node kind in one diagram
 
-## CLI
-
-```
-dorpie render <spec.json|-> [--theme id|file] [--format svg,png,ascii]
-                                 [--out path|->] [--scale n] [--transparent]
-                                 [--system-fonts] [--charset unicode|ascii] [--quiet]
-dorpie validate <spec.json|-> [--json]
-dorpie themes [id] [--json]
-dorpie schema
-dorpie init [file.json] [--force]
-dorpie save <spec.json|-> [--name NAME] [--id ID --expected-revision N]
-dorpie list [query] [--project PATH]
-dorpie get <id> [--revision N] [--spec]
-dorpie history <id>
-dorpie export <id> [--revision N] [--theme id|file] [--export-dir PATH]
-dorpie settings
-dorpie plugin install [--app opencodez|opencode]
-```
-
-Render writes files next to the spec by default and prints their paths; `--out -` streams a single format to stdout. Exit codes: `0` success, `2` invalid spec or arguments, `1` runtime failure. Details, output-path rules and troubleshooting are in [docs/cli.md](./docs/cli.md).
-
 ## Documentation
 
 - [docs/cli.md](./docs/cli.md) — commands, options, exit codes, troubleshooting
@@ -158,6 +136,8 @@ Render writes files next to the spec by default and prints their paths; `--out -
 - [docs/library.md](./docs/library.md) — saved diagrams, versions, exports and configuration
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — development setup, architecture and releases
 - [CHANGELOG.md](./CHANGELOG.md) — release history
+
+English pages use the base filename; translations add a language code, such as `cli.ru.md`. Each page links to the available languages. The same convention extends to any additional language; see [Contributing](./CONTRIBUTING.md#documentation).
 
 ## License
 

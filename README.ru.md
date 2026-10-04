@@ -1,8 +1,7 @@
 <h1 align="center">Dorpie</h1>
 
-<p align="center"><strong>Диаграммы из одного JSON-файла.</strong><br>
-Семь полноценных визуальных тем, три формата вывода, без браузера и GUI.<br>
-Сделано для ИИ-агентов, удобно и людям.</p>
+<p align="center"><strong>Опишите в JSON. Получите диаграмму. Вернитесь к ней в следующей сессии.</strong><br>
+Семь визуальных тем · SVG, PNG и ASCII · CLI, Node API и инструменты OpenCode</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
@@ -14,14 +13,14 @@
 
 Dorpie — консольная утилита, библиотека для Node и плагин OpenCode/OpenCodez: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой. Сохранённые диаграммы хранят версии исходников и историю экспортов между сессиями агента.
 
-Всё работает локально в Node: без headless-браузера, без сетевых запросов во время рендера, без аккаунтов. Типичная диаграмма рендерится заметно меньше чем за секунду. Каждая тема — это целостная визуальная система со своей типографикой, формами, линиями, фоном и композицией, а не одна и та же картинка в другой палитре.
+Всё работает локально в Node: без headless-браузера, сетевых запросов во время рендера и аккаунтов. Dorpie подходит для инструкции, наброска архитектуры, схемы релиза или диаграммы, которую агент будет дорабатывать позже. Каждая тема задаёт шрифты, формы, линии и фон как единое целое.
 
 ## Установка
 
 Нужен Node 20 или новее. Пакет распространяется как tarball во вложениях GitHub-релизов:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 dorpie --version
 ```
 
@@ -126,27 +125,6 @@ const { svg, png, ascii } = await render(spec, {
 - `examples/transformer-block.json` — residual-блок трансформера со слияниями на junction (Glass)
 - `examples/node-shapes.json` — все виды узлов на одной схеме
 
-## CLI
-
-```
-dorpie render <spec.json|-> [--theme id|file] [--format svg,png,ascii]
-                                 [--out path|->] [--scale n] [--transparent]
-                                 [--system-fonts] [--charset unicode|ascii] [--quiet]
-dorpie validate <spec.json|-> [--json]
-dorpie themes [id] [--json]
-dorpie schema
-dorpie init [file.json] [--force]
-dorpie save <spec.json|-> [--name NAME] [--id ID --expected-revision N]
-dorpie list [query] [--project PATH]
-dorpie get <id> [--revision N] [--spec]
-dorpie history <id>
-dorpie export <id> [--revision N] [--theme id|file] [--export-dir PATH]
-dorpie settings
-dorpie plugin install [--app opencodez|opencode]
-```
-
-По умолчанию рендер пишет файлы рядом со спекой и печатает их пути; `--out -` выводит один формат в stdout. Коды возврата: `0` — успех, `2` — некорректная спека или аргументы, `1` — ошибка времени выполнения. Правила выбора путей и разбор типичных проблем — в [docs/cli.ru.md](./docs/cli.ru.md).
-
 ## Документация
 
 - [docs/cli.ru.md](./docs/cli.ru.md) — команды, флаги, коды возврата, типичные проблемы
@@ -158,6 +136,8 @@ dorpie plugin install [--app opencodez|opencode]
 - [docs/library.ru.md](./docs/library.ru.md) — сохранённые диаграммы, версии, экспорты и настройки
 - [CONTRIBUTING.ru.md](./CONTRIBUTING.ru.md) — локальная разработка, архитектура и релизы
 - [CHANGELOG.ru.md](./CHANGELOG.ru.md) — история версий
+
+Английские страницы используют базовое имя файла, переводы добавляют код языка: например, `cli.ru.md`. На каждой странице есть ссылки на доступные языки. Для новых языков действует то же правило; см. [руководство разработчика](./CONTRIBUTING.ru.md#документация).
 
 ## Лицензия
 

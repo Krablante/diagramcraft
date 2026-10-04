@@ -17,7 +17,7 @@
  * @param {string} [attrs]
  */
 export function shapePath(kind, x, y, w, h, theme, attrs) {
-  if (kind === "junction") return attrs ? `<circle cx="${r(x + w / 2)}" cy="${r(y + h / 2)}" r="${r(w / 2)}" ${attrs}/>` : "";
+  if (kind === "junction") return attrs ? `<circle cx="${r(x + w / 2)}" cy="${r(y + h / 2)}" r="${r(Math.min(w, h) / 2)}" ${attrs}/>` : "";
   if (kind === "connector") return `<circle cx="${r(x + w / 2)}" cy="${r(y + h / 2)}" r="${r(Math.min(w, h) / 2)}" ${attrs ?? ""}/>`;
   if (kind === "decision") {
     const points = [
@@ -41,6 +41,11 @@ export function shapePath(kind, x, y, w, h, theme, attrs) {
   if (kind === "document") {
     const wave = Math.min(12, h * 0.18);
     const d = `M${r(x)},${r(y)} H${r(x + w)} V${r(y + h - wave)} C${r(x + w * 0.72)},${r(y + h + wave * 1.6)} ${r(x + w * 0.28)},${r(y + h - wave * 2.6)} ${r(x)},${r(y + h - wave)} Z`;
+    return `<path d="${d}" ${attrs ?? ""}/>`;
+  }
+  if (kind === "database") {
+    const ry = Math.min(11, h * 0.2);
+    const d = `M${r(x)},${r(y + ry)} A${r(w / 2)},${r(ry)} 0 0 1 ${r(x + w)},${r(y + ry)} V${r(y + h - ry)} A${r(w / 2)},${r(ry)} 0 0 1 ${r(x)},${r(y + h - ry)} Z`;
     return `<path d="${d}" ${attrs ?? ""}/>`;
   }
   if (kind === "note") {
@@ -112,6 +117,24 @@ export function borderAt(kind, rect, theme, side, coord) {
   if (kind === "note") {
     const fold = Math.min(16, w * 0.18, h * 0.32);
     if (side === "top" && coord > x + w - fold) return y + Math.min((coord - (x + w - fold)) / fold, 1) * fold;
+    if (side === "right" && coord < y + fold) return x + w - fold + Math.max(0, coord - y);
+  }
+  if (kind === "document" && side === "bottom") {
+    const wave = Math.min(12, h * 0.18);
+    const normalizedX = Math.max(0, Math.min(1, (coord - x) / w));
+    // Invert the monotone x-coordinate of the same cubic used by shapePath.
+    let low = 0;
+    let high = 1;
+    for (let i = 0; i < 24; i++) {
+      const t = (low + high) / 2;
+      const u = 1 - t;
+      const curveX = u ** 3 + 3 * u * u * t * 0.72 + 3 * u * t * t * 0.28;
+      if (curveX > normalizedX) low = t;
+      else high = t;
+    }
+    const t = (low + high) / 2;
+    const u = 1 - t;
+    return y + h + wave * (-(u ** 3) + 3 * u * u * t * 1.6 - 3 * u * t * t * 2.6 - t ** 3);
   }
   const radius = kind === "terminal" ? h / 2 : kind === "note" || kind === "document" ? 0 : theme.node.radius;
   return roundRectBorder(rect, Math.max(0, radius), side, coord);
@@ -137,6 +160,7 @@ function circleBorder(cx, cy, radius, side, coord) {
  */
 function roundRectBorder(rect, radius, side, coord) {
   const { x, y, w, h } = rect;
+  radius = Math.min(radius, w / 2, h / 2);
   if (radius <= 0) return side === "top" ? y : side === "bottom" ? y + h : side === "left" ? x : x + w;
   const vertical = side === "top" || side === "bottom";
   const flatStart = vertical ? x + radius : y + radius;

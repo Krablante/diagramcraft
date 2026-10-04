@@ -53,9 +53,9 @@ export function createLibrary(options = {}, directory = process.cwd()) {
    */
   async function save(input, settings = {}) {
     const spec = parseSpec(typeof input === "string" ? JSON.parse(input) : input);
-    const id = settings.id ? validID(settings.id) : randomUUID();
+    const id = settings.id !== undefined ? validID(settings.id) : randomUUID();
     const target = root(id);
-    const previous = settings.id ? await metadata(target) : undefined;
+    const previous = settings.id !== undefined ? await metadata(target) : undefined;
     if (previous && settings.expectedRevision !== previous.revision) throw new LibraryError(`Revision conflict: expected ${settings.expectedRevision ?? "(missing)"}, current ${previous.revision}. Read the diagram again before saving.`, "CONFLICT");
     if (!previous && settings.expectedRevision !== undefined) throw new LibraryError("expectedRevision is only valid when updating an existing diagram");
     for (const key of ["name", "description", "project", "change"]) {
@@ -69,9 +69,9 @@ export function createLibrary(options = {}, directory = process.cwd()) {
       id, revision: (previous?.revision ?? 0) + 1,
       name: settings.name ?? previous?.name ?? spec.title ?? "Untitled diagram",
       description: settings.description ?? previous?.description ?? "",
-      tags: settings.tags ?? previous?.tags ?? [], project: settings.project ?? previous?.project ?? "",
+      tags: [...(settings.tags ?? previous?.tags ?? [])], project: settings.project ?? previous?.project ?? "",
       createdAt: previous?.createdAt ?? now, updatedAt: now, change: settings.change ?? "",
-      ...(settings.origin ? { origin: settings.origin } : {}),
+      ...(settings.origin ? { origin: { ...settings.origin } } : {}),
     };
     const revisions = join(target, "revisions");
     await mkdir(revisions, { recursive: true });
@@ -123,11 +123,11 @@ export function createLibrary(options = {}, directory = process.cwd()) {
 
   /** @param {string} id @param {{limit?:number, offset?:number}} [filter] */
   async function history(id, filter = {}) {
-    await metadata(root(id));
     const limit = filter.limit ?? 50;
     const offset = filter.offset ?? 0;
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 200 || !Number.isSafeInteger(offset) || offset < 0) throw new LibraryError("limit must be 1..200 and offset a nonnegative integer");
     const numbers = (await revisionNumbers(root(id))).sort((a, b) => b - a);
+    if (!numbers.length) throw new LibraryError("Diagram not found", "NOT_FOUND");
     const revisions = [];
     for (const n of numbers.slice(offset, offset + limit)) revisions.push(await metadata(root(id), n));
     const exportEntries = (await entries(join(root(id), "exports"))).filter((e) => e.isDirectory() && !e.name.startsWith(".")).sort((a, b) => b.name.localeCompare(a.name));

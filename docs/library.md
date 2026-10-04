@@ -57,6 +57,12 @@ The library is local to the machine running Dorpie. Reopening from another sessi
 
 Revisions and exports are published as complete directories. Concurrent writers with the same expected revision cannot replace each other. An interrupted operation may leave a hidden `.pending-*` directory; it is ignored by readers and can be removed after the writer has stopped. Revisions and exports have no automatic expiry.
 
+## Storage and costs
+
+Each source revision stores one full JSON spec and metadata. Each export stores the requested files plus source, theme and export metadata; the library keeps another small export record so history survives a change of export directory. There is no background index. `list` scans the diagram folders and revision directory names, reads the latest metadata for each diagram, then sorts the matches. Pagination bounds the response, not that scan. `history` scans one diagram's revision/export names and reads metadata for the requested page. A long revision history increases directory work; a large catalog increases metadata reads.
+
+Keep backups of both source and exports. Stop writers while taking or restoring a snapshot, preserve custom theme files too, and run `settings`, `list`, `get` and `history` after restoring. Absolute export paths still refer to the original location if you move folders. A crash between publishing export files and recording their catalog entry can leave a complete export missing from history; its `export.json` and files remain available in the export directory. Do not remove a folder merely because it is absent from a history page.
+
 ## Node API
 
 ```js

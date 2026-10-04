@@ -37,6 +37,8 @@ dorpie render <spec.json|-> [options]
 | `--charset <unicode\|ascii>` | Character set for ASCII output. | spec `output.charset`, then `unicode` |
 | `-q, --quiet` | Do not print the paths of written files. | off |
 
+Options belong to their command: `validate --theme`, extra input paths and empty format lists are errors. Output arguments are checked before layout or rasterisation. Repeated formats are written once.
+
 Output paths work like this:
 
 - Without `--out`, files are written next to the input spec and named after it: `spec.svg`, `spec.png`, `spec.txt`. ASCII uses the `.txt` extension.
@@ -45,6 +47,7 @@ Output paths work like this:
 - `--out -` writes exactly one format to stdout and adds no other text. Several formats to stdout are rejected.
 - Input `-` reads the spec from stdin. Without `--out`, files land in the current directory under the base name `diagram`, for example `diagram.svg`.
 - Existing output files are overwritten on every render. Generated SVG, PNG and ASCII files are outputs, never editable sources.
+- An output path that points to the input spec is rejected, including existing symlinks and hard links to it.
 
 ```sh
 # all formats the spec asks for, next to the spec
@@ -82,6 +85,8 @@ spec error: 2 problems
 ```
 
 See [spec.md](./spec.md) for the field reference and the JSON Schema (`dorpie schema`).
+
+With `--json`, invalid JSON or spec fields return `{ "ok": false, "issues": [{ "path": "...", "message": "..." }] }` on stdout with exit code `2`. Unreadable files still report an IO error on stderr and exit `1`.
 
 ## themes
 
@@ -126,7 +131,7 @@ Library commands print JSON. They accept `--config`, `--library-dir` and `--expo
 | `2` | Invalid spec, unknown theme, or bad CLI arguments; the message explains what to fix. |
 | `1` | Runtime failure, for example an unreadable input file or an IO error. |
 
-Spec and theme errors go to stderr with readable paths, so a script can rely on the code and still log the message.
+Spec and theme errors go to stderr with readable paths; `validate --json` writes spec errors as JSON on stdout. A script can use the exit code in either mode.
 
 Library `INVALID_ARGUMENT`, `NOT_FOUND` and `CONFLICT` errors also exit `2`. A conflict requires reading the current version and reconciling changes before saving.
 

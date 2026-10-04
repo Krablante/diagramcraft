@@ -48,33 +48,27 @@ function faceFor(family, weight) {
 /**
  * Width of a single text run in pixels.
  * @param {string} text
- * @param {{family:string,size:number,weight?:number}} font
+ * @param {{family:string,size:number,weight?:number,spacing?:number}} font
  */
 export function measureText(text, font) {
   const value = String(text ?? "");
   if (!value) return 0;
   const face = faceFor(font.family, font.weight ?? 400);
-  if (!face) return value.length * font.size * FALLBACK_RATIO;
   let units = 0;
+  let characters = 0;
   for (const ch of value) {
-    const advance = face.map.get(ch);
-    units += typeof advance === "number" ? advance : face.average * FALLBACK_RATIO * 1.6;
+    characters += 1;
+    const advance = face?.map.get(ch);
+    units += face ? typeof advance === "number" ? advance : face.average * FALLBACK_RATIO * 1.6 : FALLBACK_RATIO;
   }
-  return (units / face.unitsPerEm) * font.size;
-}
-
-/** @param {string} text @param {{family:string,size:number,weight?:number}} font */
-export function measureLines(text, font) {
-  return String(text ?? "")
-    .split("\n")
-    .map((line) => measureText(line, font));
+  return (units / (face?.unitsPerEm ?? 1)) * font.size + Math.max(0, characters - 1) * (font.spacing ?? 0);
 }
 
 /**
  * Greedy word wrap. Long words are split at character level so they never
  * overflow the requested width.
  * @param {string} text
- * @param {{family:string,size:number,weight?:number}} font
+ * @param {{family:string,size:number,weight?:number,spacing?:number}} font
  * @param {number} maxWidth
  * @returns {string[]}
  */
@@ -87,13 +81,30 @@ export function wrapText(text, font, maxWidth) {
       continue;
     }
     let line = "";
+    let width = 0;
+    const space = measureText(" ", font) + 2 * (font.spacing ?? 0);
     for (const word of words) {
-      const candidate = line ? `${line} ${word}` : word;
-      if (measureText(candidate, font) <= maxWidth || !line) {
-        line = candidate;
-      } else {
+      const wordWidth = measureText(word, font);
+      if (line && width + space + wordWidth > maxWidth) {
         out.push(line);
-        line = word;
+        line = "";
+        width = 0;
+      }
+      if (wordWidth <= maxWidth) {
+        width += (line ? space : 0) + wordWidth;
+        line += `${line ? " " : ""}${word}`;
+        continue;
+      }
+      // Measure each character once instead of repeatedly measuring growing runs.
+      for (const ch of word) {
+        const advance = measureText(ch, font);
+        if (line && width + advance + (font.spacing ?? 0) > maxWidth) {
+          out.push(line);
+          line = "";
+          width = 0;
+        }
+        width += advance + (line ? font.spacing ?? 0 : 0);
+        line += ch;
       }
     }
     out.push(line);
@@ -104,7 +115,7 @@ export function wrapText(text, font, maxWidth) {
 /**
  * Width of the widest line.
  * @param {string[]} lines
- * @param {{family:string,size:number,weight?:number}} font
+ * @param {{family:string,size:number,weight?:number,spacing?:number}} font
  */
 export function widestLine(lines, font) {
   let width = 0;

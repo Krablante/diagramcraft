@@ -97,7 +97,7 @@ To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `know
 
 | Token | Meaning |
 | --- | --- |
-| `minWidth` | Minimum node width. |
+| `minWidth` | Minimum content width; horizontal padding is added around it. |
 | `maxTextWidth` | Wrap labels beyond this width. |
 | `padX`, `padY` | Inner padding. |
 | `radius` | Corner radius for boxes. |
@@ -106,7 +106,7 @@ To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `know
 | `shadow` | `{ color, opacity, blur, y }` or `null`. |
 | `glow` | `{ color, blur }` or `null`; adds a soft halo. |
 | `shine` | Paint overlay for glass-style highlights, or `null`. |
-| `kinds.<kind>` | Per-kind overrides: any of the tokens above, plus `size` for `connector` and `junction`. |
+| `kinds.<kind>` | Per-kind `fill`, `stroke`, `shadow` and `glow`, plus `size` for `connector` and `junction`. |
 | `accent` | `{ fill, stroke, text: { color } }` used by `accent: true` nodes. |
 
 ### `edge`

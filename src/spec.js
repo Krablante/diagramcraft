@@ -1,6 +1,7 @@
 // Spec parsing and validation. The spec is the editable source of truth:
 // every output format renders from it.
 // @ts-check
+import { clone } from "./util.js";
 
 /** @typedef {import("./types.js").Spec} Spec */
 /** @typedef {import("./types.js").SpecIssue} SpecIssue */
@@ -97,7 +98,7 @@ export function parseSpec(raw) {
 
   let direction = "TB";
   if (input.direction != null) {
-    const value = String(input.direction).toUpperCase();
+    const value = typeof input.direction === "string" ? input.direction.toUpperCase() : "";
     if (!DIRECTIONS.includes(value)) problem("direction", `unknown direction ${JSON.stringify(input.direction)}; expected one of ${DIRECTIONS.join(", ")}`);
     else direction = value;
   }
@@ -120,7 +121,7 @@ export function parseSpec(raw) {
   let style = null;
   if (input.style != null) {
     if (!isObject(input.style)) problem("style", "must be an object with theme token overrides");
-    else style = input.style;
+    else style = clone(input.style);
   }
 
   /** @type {{formats?:string[], scale?:number, transparent?:boolean, charset?:string}} */
@@ -144,7 +145,7 @@ export function parseSpec(raw) {
         if (typeof input.output.scale !== "number" || !Number.isFinite(input.output.scale) || input.output.scale <= 0) problem("output.scale", "must be a positive number");
         else output.scale = input.output.scale;
       }
-      if (input.output.transparent != null) {
+      if (input.output.transparent !== undefined) {
         if (typeof input.output.transparent !== "boolean") problem("output.transparent", "must be a boolean");
         else output.transparent = input.output.transparent;
       }
@@ -185,7 +186,7 @@ export function parseSpec(raw) {
 
       let kind = "process";
       if (node.kind != null) {
-        const value = String(node.kind);
+        const value = typeof node.kind === "string" ? node.kind : "";
         if (!NODE_KINDS.includes(/** @type {NodeKind} */ (value))) problem(`${path}.kind`, `unknown node kind ${JSON.stringify(node.kind)}; expected one of ${NODE_KINDS.join(", ")}`);
         else kind = value;
       }
@@ -195,7 +196,7 @@ export function parseSpec(raw) {
 
       const label = kind === "junction" ? "" : str(`${path}.label`, node.label, id) ?? id;
       const note = str(`${path}.note`, node.note);
-      if (node.accent != null && typeof node.accent !== "boolean") problem(`${path}.accent`, "must be a boolean");
+      if (node.accent !== undefined && typeof node.accent !== "boolean") problem(`${path}.accent`, "must be a boolean");
       const accent = node.accent === undefined ? false : Boolean(node.accent);
       const color = str(`${path}.color`, node.color);
 
@@ -254,13 +255,13 @@ export function parseSpec(raw) {
 
       let kind = "solid";
       if (edge.kind != null) {
-        const value = String(edge.kind);
+        const value = typeof edge.kind === "string" ? edge.kind : "";
         if (!EDGE_KINDS.includes(value)) problem(`${path}.kind`, `unknown edge kind ${JSON.stringify(edge.kind)}; expected one of ${EDGE_KINDS.join(", ")}`);
         else kind = value;
       }
       let arrow = "end";
       if (edge.arrow != null) {
-        const value = String(edge.arrow);
+        const value = typeof edge.arrow === "string" ? edge.arrow : "";
         if (!ARROW_KINDS.includes(value)) problem(`${path}.arrow`, `unknown arrow ${JSON.stringify(edge.arrow)}; expected one of ${ARROW_KINDS.join(", ")}`);
         else arrow = value;
       }
@@ -340,18 +341,4 @@ export function parseSpec(raw) {
     edges,
     groups,
   };
-}
-
-/**
- * Human-readable message for a failed JSON.parse.
- * @param {string} source
- * @param {string} text
- */
-export function jsonSyntaxMessage(source, text) {
-  try {
-    JSON.parse(text);
-    return `${source}: invalid JSON`;
-  } catch (error) {
-    return `${source}: invalid JSON (${error instanceof Error ? error.message : String(error)})`;
-  }
 }

@@ -34,6 +34,10 @@ export function defaultPaths() {
  * @param {string} [directory] relative explicit paths belong to the caller
  */
 export function resolveConfig(options = {}, directory = process.cwd()) {
+  for (const [key, value] of Object.entries(options)) {
+    if (!["libraryDir", "exportDir", "configFile"].includes(key)) throw new LibraryError(`Unknown Dorpie option: ${key}`);
+    if (value !== undefined && (typeof value !== "string" || !value.trim())) throw new LibraryError(`${key} must be a nonempty path`);
+  }
   const defaults = defaultPaths();
   const explicit = options.configFile ?? process.env.DORPIE_CONFIG;
   const configFile = absolute(explicit ?? defaults.configFile, directory);
@@ -48,10 +52,6 @@ export function resolveConfig(options = {}, directory = process.cwd()) {
   for (const [key, value] of Object.entries(file)) {
     if (!["libraryDir", "exportDir"].includes(key)) throw new LibraryError(`Unknown Dorpie config field: ${key}`);
     if (typeof value !== "string" || !value.trim()) throw new LibraryError(`${key} must be a nonempty path`);
-  }
-  for (const [key, value] of Object.entries(options)) {
-    if (!["libraryDir", "exportDir", "configFile"].includes(key)) throw new LibraryError(`Unknown Dorpie option: ${key}`);
-    if (value !== undefined && (typeof value !== "string" || !value.trim())) throw new LibraryError(`${key} must be a nonempty path`);
   }
   const libraryDir = options.libraryDir !== undefined ? absolute(options.libraryDir, directory)
     : process.env.DORPIE_LIBRARY_DIR ? absolute(process.env.DORPIE_LIBRARY_DIR, directory)

@@ -27,6 +27,7 @@ export function bundledFontFiles() {
  * @returns {Buffer}
  */
 export function svgToPng(svg, options = {}) {
+  if (options.scale !== undefined && (!Number.isFinite(options.scale) || options.scale <= 0)) throw new RangeError("scale must be a positive number");
   const resvg = new Resvg(svg, {
     fitTo: { mode: "zoom", value: options.scale ?? 2 },
     font: {

@@ -8,7 +8,7 @@ This page is written for AI agents and for people who configure them. Everything
 
 ```sh
 # global install from the release tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 
 # or run straight from a checkout, no install
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -28,7 +28,7 @@ Example specs live in [`examples/`](../examples) in the repository and in the in
    dorpie validate spec.json --json   # machine-readable
    ```
    Exit code `2` means the spec is invalid; every problem is reported with its JSON path.
-3. **Render.** SVG is cheap, ASCII is cheapest, PNG is for the user.
+3. **Render.** SVG gives a vector image, ASCII a terminal view, PNG a visual preview.
    ```sh
    dorpie render spec.json --format svg,ascii --out out/
    dorpie render spec.json --format png --scale 2 --out out/diagram.png
@@ -87,7 +87,7 @@ You can create and edit diagrams with the dorpie CLI.
 | label on a junction | `nodes[3].label: junction nodes do not render a label` |
 | typo in a field name | `nodes[0].lable: unknown field "lable"` |
 | long labels | nodes get wide and the layout gets tall; wrap with `\n` or shorten |
-| treating groups as layout containers | nodes may sit outside a zone if the flow spreads; steer the flow with `direction` and node order instead |
+| treating groups as layout containers | unrelated nodes may fall inside a member zone; groups do not constrain positions, so steer the flow with `direction` and node order |
 
 ## Programmatic use
 

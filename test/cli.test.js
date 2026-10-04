@@ -58,8 +58,20 @@ test("validate exits 2 with readable issues", () => {
     const result = run(["validate", file]);
     assert.equal(result.status, 2);
     assert.match(result.stderr, /edges\[0\]\.to/);
+    const structured = run(["validate", file, "--json"]);
+    assert.equal(structured.status, 2);
+    assert.equal(JSON.parse(structured.stdout).ok, false);
+    assert.equal(JSON.parse(structured.stdout).issues[0].path, "edges[0].to");
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("CLI rejects ignored flags, extra inputs and destructive output paths", () => {
+  for (const args of [["validate", example, "--theme", "glass"], ["render", example, "extra.json"], ["render", example, "--format", ""], ["render", example, "--format", "svg,ascii", "--out", "-"], ["schema", "extra"], ["render", example, "--format", "svg", "--out", example]]) {
+    const result = run(args);
+    assert.equal(result.status, 2, `${args}: ${result.stderr}`);
+    assert.equal(result.stdout, "");
   }
 });
 

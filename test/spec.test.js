@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { parseSpec, SpecError } from "../src/spec.js";
+import { readFileSync } from "node:fs";
+import { z } from "zod";
 
 const minimal = {
   nodes: [{ id: "a", label: "A" }, { id: "b", kind: "decision", label: "B" }],
@@ -76,4 +78,23 @@ test("rejects labels on junction nodes and self-loops", () => {
 test("keeps output overrides", () => {
   const spec = parseSpec({ ...minimal, output: { formats: ["png", "ascii"], scale: 3, transparent: true, charset: "ascii" } });
   assert.deepEqual(spec.output, { formats: ["png", "ascii"], scale: 3, transparent: true, charset: "ascii" });
+});
+
+test("published schema accepts editable normalized revisions and matches field types", () => {
+  const schema = z.fromJSONSchema(JSON.parse(readFileSync(new URL("../schema/diagram.schema.json", import.meta.url), "utf8")));
+  for (const raw of [minimal, { ...minimal, direction: "lr" }, { ...minimal, title: null, style: null, output: null }]) {
+    assert.ok(schema.safeParse(raw).success);
+    assert.ok(schema.safeParse(parseSpec(raw)).success);
+  }
+  for (const raw of [
+    { ...minimal, direction: ["TB"] },
+    { ...minimal, nodes: [{ id: "a", kind: ["process"] }] },
+    { ...minimal, nodes: [{ id: "a", accent: null }] },
+    { ...minimal, output: { transparent: null } },
+    { ...minimal, output: { scale: -1 } },
+    { ...minimal, nodes: [{ id: "a", width: 0 }] },
+  ]) {
+    assert.equal(schema.safeParse(raw).success, false);
+    assert.throws(() => parseSpec(raw), SpecError);
+  }
 });

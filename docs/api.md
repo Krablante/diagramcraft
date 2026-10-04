@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Install it from a release tarball or straight from the repository:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.3.0/dorpie-0.3.0.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
 # or, tracking main:
 npm install github:Krablante/dorpie
 ```
@@ -35,7 +35,7 @@ const { svg, png, ascii } = await render(spec, {
 
 | Option | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `theme` | string or object | spec `theme` | Built-in id, path to a theme JSON file, or a fully resolved theme object. |
+| `theme` | string or object | spec `theme` | Built-in id, file path, or theme object with `id` and `title`; missing tokens use base defaults. |
 | `formats` | array | spec `output.formats`, then `["svg"]` | Which outputs to produce; an empty array also falls back to the default. |
 | `scale` | number | spec `output.scale`, then `2` | PNG scale multiplier. |
 | `transparent` | boolean | spec `output.transparent`, then `false` | Drop the canvas background in SVG and PNG. |
@@ -143,3 +143,7 @@ const png = svgToPng(svg, { scale: 3 });
 ## Side effects and determinism
 
 `render` never writes files, never opens a browser and never makes network requests. The same spec and theme produce the same SVG string; PNG and ASCII are deterministic too, because PNG uses the bundled fonts instead of host fonts. Reading theme files, font metrics and bundled fonts is the only file access involved.
+
+Options are validated before layout: unknown formats, nonpositive scale, an unknown charset and non-boolean switches throw `SpecError`. Theme loading checks the font sizes and core spacing needed by layout and throws `ThemeError` for unusable values.
+
+PNG work grows with canvas area: doubling `scale` makes four times as many pixels, before shadows and textures add their cost. Prefer SVG for large diagrams and scale 1 for preview PNGs. `render` always produces pixel geometry and SVG; requesting ASCII adds another ELK layout and a character grid. For an ASCII-only embedding that needs no pixel result, call `renderAscii(parseSpec(raw), getTheme("mono"))` directly. Its output cost grows with the grid's bounding area, including empty cells.

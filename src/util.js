@@ -13,7 +13,10 @@ export function deepMerge(base, override) {
   if (base && override && typeof base === "object" && typeof override === "object") {
     const out = { ...clone(base) };
     for (const [key, value] of Object.entries(override)) {
-      out[key] = key in out ? deepMerge(out[key], value) : clone(value);
+      Object.defineProperty(out, key, {
+        value: Object.hasOwn(out, key) ? deepMerge(out[key], value) : clone(value),
+        enumerable: true, writable: true, configurable: true,
+      });
     }
     return out;
   }
@@ -44,19 +47,4 @@ export function escapeXml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-/** @param {string} value */
-export function slug(value) {
-  return String(value).replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "x";
-}
-
-/** @param {string} value */
-export function hashString(value) {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i++) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36);
 }
