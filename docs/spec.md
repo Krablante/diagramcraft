@@ -114,9 +114,12 @@ A group is a visual zone drawn behind its member nodes. It does not influence la
 {
   "theme": "vivid",
   "style": {
-    "palette": { "accent": "#0f766e" },
     "fonts": { "title": { "size": 32 } },
-    "node": { "radius": 16, "shadow": null },
+    "node": {
+      "radius": 16,
+      "shadow": null,
+      "accent": { "fill": { "type": "solid", "color": "#0f766e" } }
+    },
     "edge": { "stroke": { "color": "#0f172a", "width": 1.8 } }
   }
 }

@@ -15,13 +15,18 @@ Everything runs locally in Node. No headless browser, no network calls, no accou
 ## Install
 
 ```sh
+# from the GitHub release (works today)
+npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.0.tgz
+
+# from the repository
+npm install -g github:Krablante/diagramcraft
+
+# once the npm package is published
 npm install -g diagramcraft
-# or run without installing
 npx diagramcraft --help
-bunx diagramcraft --help
 ```
 
-Node 20 or newer. SVG works everywhere; PNG needs no system libraries (fonts are bundled); ASCII needs nothing at all.
+Node 20 or newer. SVG works everywhere; PNG needs no system libraries (fonts are bundled); ASCII needs nothing at all. Publishing to npm is pending a valid automation token; the release tarball is byte-for-byte the npm package.
 
 ## 30-second quickstart
 

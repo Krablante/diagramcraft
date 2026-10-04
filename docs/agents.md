@@ -5,7 +5,11 @@ This page is written for AI agents and for people who configure them. Everything
 ## Setup
 
 ```sh
-npm install -g diagramcraft     # or: npx diagramcraft <command>
+# from a GitHub release (until the npm package is published)
+npm install -g https://github.com/Krablante/diagramcraft/releases/latest/download/diagramcraft-0.1.0.tgz
+# or from a checkout
+node /path/to/diagramcraft/bin/diagramcraft.js <command>
+
 diagramcraft schema             # full JSON Schema of the spec
 diagramcraft themes             # theme ids and descriptions
 ```
