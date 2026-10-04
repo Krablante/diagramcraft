@@ -41,10 +41,13 @@ Arrays (like gradient stops) are replaced, not merged.
 | `vivid` | muted fills by node kind, dark labels and a teal accent; colour-coded flowcharts |
 | `blueprint` | fine blue grid, opaque shapes, monospace labels and open arrows; technical drawings |
 | `copper` | charcoal grain, copper highlights and raised surfaces; warm presentation diagrams |
+| `glass` | transparent lenses, stronger edge refraction, directional rims and soft shadows; Liquid Glass |
 
-Classic, Mono, Light, Dark and Vivid use flat fills without filters. Paper and Copper use fine grain and small shadows; Blueprint keeps a low-contrast grid outside the shapes. All use bundled fonts and run locally.
+Classic, Mono, Light, Dark and Vivid use flat fills without filters. Paper and Copper use fine grain and small shadows; Blueprint keeps a low-contrast grid outside the shapes. Liquid Glass samples the actual canvas and zone backgrounds through clipped vector lenses: the centre and edge magnify them differently. Its shared backdrop contains no labels or connecting routes, so those stay sharp. All themes use bundled fonts and run locally.
 
-`glass` and `midnight` are compatibility ids for `light` and `dark`, omitted from listings. `getTheme` and new exports return the replacement theme id. Saved source revisions keep their original spec; existing exports keep their files and resolved theme snapshots. To reproduce an older appearance, pass its archived `theme.json` as a custom theme file.
+`glass` is a standalone theme again from 0.5.0; in 0.4.0 it selected Light. `midnight` remains a compatibility id for `dark`, omitted from listings. Saved source revisions keep their original spec; existing exports keep their files and resolved theme snapshots. To reproduce an older appearance, pass its archived `theme.json` as a custom theme file.
+
+Transparent export removes the sampled canvas. Glass then keeps its tint, rims and shadows; a static PNG/SVG cannot refract a slide background added after export. Use a normal export to preserve the complete optical effect.
 
 `dorpie themes --json` also returns `description`, `tags`, `title` and `order` for each theme. Metadata never affects rendering except `order`, which sorts the listings.
 
@@ -56,7 +59,7 @@ Classic, Mono, Light, Dark and Vivid use flat fills without filters. Paper and C
 | --- | --- |
 | `background` | Paint for the canvas. |
 | `blobs` | Array of soft colour fields: `{ cx, cy, r, color, opacity }`, coordinates `0..1`. `null` to disable. |
-| `texture` | `noise`, `grid` or `dots` overlay, `null` to disable. |
+| `texture` | `noise`, `grid`, `dots` or `contours` overlay, `null` to disable. `contours` uses `size`, `color` and `width` for repeating wave lines. |
 | `vignette` | `{ color, opacity, size }` edge darkening, `null` to disable. |
 | `padding` | Distance from content to the canvas edge. |
 | `minWidth` | Minimum content width before padding. |
@@ -111,8 +114,9 @@ To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `know
 | `shadow` | `{ color, opacity, blur, y }` or `null`. |
 | `glow` | `{ color, blur }` or `null`; adds a soft halo. |
 | `shine` | Paint overlay for glass-style highlights, or `null`. |
-| `kinds.<kind>` | Per-kind `fill`, `stroke`, `shadow` and `glow`, plus `size` for `connector` and `junction`. |
+| `kinds.<kind>` | Per-kind `fill`, `stroke`, `shadow`, `glow` and `glass`, plus `size` for `connector` and `junction`. A null `fill` inherits the normal node paint; a null `glass` disables the material for that kind. |
 | `accent` | `{ fill, stroke, text: { color }, note?: { color } }` used by `accent: true` nodes. Secondary text follows the accent text colour unless `note.color` overrides it. |
+| `glass` | `{ refraction, edgeRefraction, bevel, bevelWidth, rim, rimWidth }` or `null`. Refraction values are positive local magnification factors. `bevel` and `rim` are paints; widths are nonnegative pixels. Defaults: centre `1.14`, edge follows centre, bevel `6`, rim `1.5`; omitted paints draw no highlight. The normal node fill supplies the translucent tint. |
 
 ### `edge`
 
@@ -135,6 +139,7 @@ To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `know
 | `padY` | Vertical padding; keep it small so adjacent zones do not collide. |
 | `labelPad` | Label inset. |
 | `labelColor` | Label colour override; `null` uses `fonts.zone.color`. |
+| `labelFill` | Paint behind the group name, or `null` to use the zone fill. An opaque fill keeps crossing routes from showing through a translucent zone label. |
 
 ### `heading`, `footer`, `layout`
 

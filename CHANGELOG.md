@@ -4,6 +4,13 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-10-04
+
+- Restore `glass` as a standalone Liquid Glass theme alongside the other eight themes. Existing `light` remains available; `midnight` still resolves to `dark`. Archived exports retain their original appearance and theme snapshots.
+- Add a shared vector glass material: the centre and thick edge refract the actual canvas/zone backdrop at different magnifications, with translucent tint, directional bevels, light-catching rims and soft depth. Connecting routes and labels stay sharp. No new dependencies or per-node canvas-sized displacement filters.
+- Add configurable contour textures and opaque group-name backgrounds for translucent zones. Transparent exports keep the glass tint, rims and shadows without sampling a nonexistent canvas.
+- Reserve room above document waves so secondary text no longer intersects the lower outline. Update the bilingual theme reference, gallery and agent guidance.
+
 ## [0.4.0] - 2026-10-04
 
 - Replace Glass and Midnight with restrained Light and Dark themes. The old ids still resolve to their replacements, so saved specs remain usable; archived exports keep their original files and theme snapshots.

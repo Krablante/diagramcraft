@@ -1,14 +1,14 @@
 <h1 align="center">Dorpie</h1>
 
 <p align="center"><strong>Опишите в JSON. Получите диаграмму. Вернитесь к ней в следующей сессии.</strong><br>
-Восемь визуальных тем · SVG, PNG и ASCII · CLI, Node API и инструменты OpenCode</p>
+Девять визуальных тем · SVG, PNG и ASCII · CLI, Node API и инструменты OpenCode</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
 </p>
 
 <p align="center">
-  <img alt="Схема выпуска в теме Copper" src="./docs/gallery/theme-copper.png" width="560">
+  <img alt="Схема выпуска в теме Liquid Glass" src="./docs/gallery/theme-glass.png" width="560">
 </p>
 
 Dorpie — консольная утилита, библиотека для Node и плагин OpenCode/OpenCodez: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой. Сохранённые диаграммы хранят версии исходников и историю экспортов между сессиями агента.
@@ -20,7 +20,7 @@ Dorpie — консольная утилита, библиотека для Node
 Нужен Node 20 или новее. Пакет распространяется как tarball во вложениях GitHub-релизов:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 dorpie --version
 ```
 
@@ -77,7 +77,7 @@ dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
 
 ## Темы
 
-Classic подходит для привычных блок-схем, Mono — для чёрно-белой печати, Light и Dark — под фон документа. Paper и Copper добавляют тонкую фактуру и неглубокие тени, Blueprint — сдержанную чертёжную сетку. В Vivid цвет помогает различать виды узлов, а формы остаются читаемыми.
+Classic подходит для привычных блок-схем, Mono — для чёрно-белой печати, Light и Dark — под фон документа. Paper и Copper добавляют тонкую фактуру и неглубокие тени, Blueprint — сдержанную чертёжную сетку. В Vivid цвет помогает различать виды узлов, а формы остаются читаемыми. Liquid Glass преломляет фон через прозрачные поверхности и более сильные линзы по краям, с направленными бликами и мягкими тенями.
 
 | | |
 |---|---|
@@ -85,8 +85,9 @@ Classic подходит для привычных блок-схем, Mono — �
 | ![Light](./docs/gallery/theme-light.png) **Light** — мягкий серый фон, белые узлы, сдержанный синий | ![Dark](./docs/gallery/theme-dark.png) **Dark** — графитовые поверхности, чёткие контуры, светло-синий акцент |
 | ![Paper](./docs/gallery/theme-paper.png) **Paper** — светлая бумажная фактура, антиква, лёгкий рельеф | ![Copper](./docs/gallery/theme-copper.png) **Copper** — графитовая фактура, тёплые блики, объёмные поверхности |
 | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — приглушённые цвета по видам узлов, зелёный акцент | ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — тонкая синяя сетка, чертёжные линии, открытые стрелки |
+| ![Liquid Glass](./docs/gallery/theme-glass.png) **Liquid Glass** — прозрачные линзы, преломлённые контуры, блики по кромке | |
 
-Прежние id `glass` и `midnight` выбирают `light` и `dark`. Старые спеки продолжают рендериться; новые экспорты записывают тему-замену. Ранее сохранённые экспорты сохраняют исходные файлы и снимки тем. См. [все формы узлов](./docs/gallery/node-shapes.png) и [справочник тем](./docs/themes.ru.md).
+`glass` выбирает самостоятельную тему Liquid Glass. Прежний id `midnight` выбирает `dark`. Ранее сохранённые экспорты сохраняют исходные файлы и снимки тем, включая экспорты версии 0.4.0, когда `glass` выбирал Light. См. [все формы узлов](./docs/gallery/node-shapes.png) и [справочник тем](./docs/themes.ru.md).
 
 Темы — это данные. Возьмите встроенную тему за основу: `dorpie themes paper > my-theme.json`, меняйте что нужно и рендерите с `--theme my-theme.json`. Небольшие правки можно оставить в спеке:
 

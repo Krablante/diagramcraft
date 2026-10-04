@@ -1,14 +1,14 @@
 <h1 align="center">Dorpie</h1>
 
 <p align="center"><strong>Write JSON. Get a diagram. Reopen it next session.</strong><br>
-Eight visual themes · SVG, PNG and ASCII · CLI, Node API and OpenCode tools</p>
+Nine visual themes · SVG, PNG and ASCII · CLI, Node API and OpenCode tools</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
 </p>
 
 <p align="center">
-  <img alt="Release workflow rendered in the Copper theme" src="./docs/gallery/theme-copper.png" width="560">
+  <img alt="Release workflow rendered in the Liquid Glass theme" src="./docs/gallery/theme-glass.png" width="560">
 </p>
 
 Dorpie is a CLI, Node library and OpenCode/OpenCodez plugin that renders a JSON diagram spec into SVG, PNG and ASCII. The spec is the source of truth: you describe nodes and edges once and render every format from them, so “add one more block” stays a two-line edit instead of a redraw. Saved diagrams keep source revisions and export history across agent sessions.
@@ -20,7 +20,7 @@ Everything runs locally in Node — no headless browser, no network calls while 
 Node 20 or newer. The package ships as a tarball attached to GitHub releases:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 dorpie --version
 ```
 
@@ -77,7 +77,7 @@ For work you want to reopen later, use `dorpie save spec.json --name "Deploy flo
 
 ## Themes
 
-Use Classic for standard flowcharts, Mono for monochrome print, and Light or Dark to match your document. Paper and Copper add fine grain and shallow shadows; Blueprint uses a restrained drawing grid. Vivid distinguishes node kinds with colour while keeping their shapes legible.
+Use Classic for standard flowcharts, Mono for monochrome print, and Light or Dark to match your document. Paper and Copper add fine grain and shallow shadows; Blueprint uses a restrained drawing grid. Vivid distinguishes node kinds with colour while keeping their shapes legible. Liquid Glass refracts the backdrop through transparent surfaces and stronger edge lenses, with directional rims and soft shadows.
 
 | | |
 |---|---|
@@ -85,8 +85,9 @@ Use Classic for standard flowcharts, Mono for monochrome print, and Light or Dar
 | ![Light](./docs/gallery/theme-light.png) **Light** — soft grey canvas, white nodes, restrained blue | ![Dark](./docs/gallery/theme-dark.png) **Dark** — charcoal surfaces, clear outlines, pale blue accent |
 | ![Paper](./docs/gallery/theme-paper.png) **Paper** — ivory grain, serif labels, shallow relief | ![Copper](./docs/gallery/theme-copper.png) **Copper** — charcoal grain, warm highlights, raised surfaces |
 | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — muted colour-coded shapes, teal accent | ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — fine blue grid, technical lines, open arrows |
+| ![Liquid Glass](./docs/gallery/theme-glass.png) **Liquid Glass** — transparent lenses, refracted contours, light-catching rims | |
 
-The retired ids `glass` and `midnight` resolve to `light` and `dark`. Existing specs still render; new exports record the replacement theme. Previously saved exports retain their original files and theme snapshots. See [every node shape](./docs/gallery/node-shapes.png) and the [theme reference](./docs/themes.md).
+`glass` selects the standalone Liquid Glass theme. The retired id `midnight` resolves to `dark`. Previously saved exports retain their original files and theme snapshots, including exports from 0.4.0 when `glass` selected Light. See [every node shape](./docs/gallery/node-shapes.png) and the [theme reference](./docs/themes.md).
 
 Themes are data. Start from a built-in with `dorpie themes paper > my-theme.json`, change what you need, and render with `--theme my-theme.json`. Small tweaks can stay in the spec:
 

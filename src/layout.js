@@ -63,6 +63,7 @@ function sizeNode(node, theme) {
     h = Math.ceil(requiredHeight);
   }
   if (node.kind === "database") h += 22; // Keep text below the cylinder's top cap.
+  if (node.kind === "document") h += 18; // Reserve the wave below the text block.
 
   return {
     lines,

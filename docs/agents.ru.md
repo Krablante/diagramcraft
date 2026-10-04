@@ -8,7 +8,7 @@
 
 ```sh
 # глобальная установка из релизного tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 
 # или запуск прямо из репозитория, без установки
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -48,7 +48,8 @@ dorpie themes             # id и описания тем
 - Перед тем как сообщить об успехе, посмотри на PNG (vision) или ASCII сам.
 - Выбирай тему по задаче: classic (обычная), mono (чёрно-белая), light
   или dark (фон документа), paper (бумажная фактура), vivid (цветовые виды),
-  blueprint (чертёжная сетка), copper (тёплый объём). Список — `dorpie themes`.
+  blueprint (чертёжная сетка), copper (тёплый объём), glass (Liquid Glass
+  с преломлением фона и прозрачными поверхностями). Список — `dorpie themes`.
 - Подписи держи короткими; детали — в `note`; на развилках подписывай связи
   yes/no; группы — для фаз, а не для украшения.
 ```
@@ -65,6 +66,7 @@ dorpie themes             # id и описания тем
 | инженерия, инфраструктура, техническая документация | `blueprint` |
 | печать, фотокопии, строгий монохром | `mono` |
 | презентационные схемы с тёплой фактурой и глубиной | `copper` |
+| прозрачное стекло с преломлением и бликами по кромке | `glass` |
 
 ## Как писать спеки, которые хорошо рендерятся
 

@@ -15,7 +15,7 @@ const spec = JSON.parse(readFileSync(join(here, "..", "examples", "quickstart.js
 
 test("renders every built-in theme", async () => {
   const themes = listThemes();
-  assert.ok(themes.length >= 8, "expected at least eight built-in themes");
+  assert.ok(themes.length >= 9, "expected at least nine built-in themes");
   for (const theme of themes) {
     const result = await render(spec, { theme: theme.id, formats: ["svg", "ascii"] });
     assert.ok(result.svg.startsWith("<svg"), `${theme.id}: svg output`);
@@ -32,13 +32,39 @@ test("svg output is deterministic", async () => {
 });
 
 test("retired theme ids resolve to the replacement themes", async () => {
-  for (const [retired, replacement] of [["glass", "light"], ["midnight", "dark"]]) {
+  for (const [retired, replacement] of [["midnight", "dark"]]) {
     assert.equal(getTheme(retired), getTheme(replacement));
     const old = await render(spec, { theme: retired, formats: ["svg"] });
     const current = await render(spec, { theme: replacement, formats: ["svg"] });
     assert.equal(old.svg, current.svg);
     assert.equal(old.theme.id, replacement);
   }
+});
+
+test("glass is a distinct material with a shared refracted backdrop and shaped rims", async () => {
+  assert.equal(getTheme("glass").id, "glass");
+  const spec = JSON.parse(readFileSync(join(here, "..", "examples", "node-shapes.json"), "utf8"));
+  const result = await render(spec, { theme: "glass", formats: ["svg", "png"], scale: 1 });
+  assert.equal((result.svg.match(/<g id="[^"]+"><rect width=/g) ?? []).length, 1, "one shared backdrop");
+  for (const node of spec.nodes.filter(n => n.kind !== "junction")) {
+    assert.ok(result.svg.includes(`data-lens="${node.id}"`), node.id);
+    assert.ok(result.svg.includes(`data-glass="${node.id}"`), node.id);
+  }
+  assert.ok(!result.svg.includes('data-lens="junction"'));
+  assert.ok(!result.svg.includes("feDisplacementMap"), "no per-node canvas-sized raster filter");
+  const maxWidth = Math.max(...result.model.nodes.map(n => n.w));
+  const maxHeight = Math.max(...result.model.nodes.map(n => n.h));
+  const lensPatterns = [...result.svg.matchAll(/<pattern[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*viewBox=/g)];
+  assert.ok(lensPatterns.length > 0);
+  for (const [, width, height] of lensPatterns) assert.ok(Number(width) <= maxWidth && Number(height) <= maxHeight, "lens raster work is bounded by node dimensions");
+  const repeat = await render(spec, { theme: "glass" });
+  assert.equal(result.svg, repeat.svg);
+  const transparent = await render(spec, { theme: "glass", transparent: true });
+  assert.ok(!transparent.svg.includes("data-lens="), "transparent export does not invent a backdrop");
+  assert.ok(transparent.svg.includes('data-glass="process"'), "rims survive without a background");
+  const disabled = await render({ ...spec, style: { node: { glass: null } } }, { theme: "glass" });
+  assert.ok(!disabled.svg.includes("data-lens="), "custom themes can disable the material");
+  assert.equal(result.png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
 });
 
 test("accent nodes use readable secondary text and support an override", async () => {
@@ -138,7 +164,7 @@ test("SVG escapes colors and deep merging cannot change object prototypes", asyn
 
 test("render rejects invalid options and unusable font/spacing tokens", async () => {
   for (const options of [{ formats: ["pdf"] }, { scale: 0 }, { charset: "wrong" }, { transparent: "yes" }]) await assert.rejects(render(spec, /** @type {any} */ (options)), SpecError);
-  for (const style of [{ fonts: { node: { size: 0 } } }, { node: { maxTextWidth: -1 } }, { canvas: null }]) await assert.rejects(render({ ...spec, style }), ThemeError);
+  for (const style of [{ fonts: { node: { size: 0 } } }, { node: { maxTextWidth: -1 } }, { canvas: null }, { node: { glass: { refraction: 0 } } }, { node: { kinds: { note: { glass: { rimWidth: -1 } } } } }]) await assert.rejects(render({ ...spec, style }), ThemeError);
 });
 
 test("document waves and folded note corners expose their actual borders", () => {
@@ -146,4 +172,17 @@ test("document waves and folded note corners expose their actual borders", () =>
   const theme = getTheme("classic");
   assert.ok(Math.abs(borderAt("document", rect, theme, "bottom", 50) - 92.5) < 0.001);
   assert.equal(borderAt("note", rect, theme, "right", 8), 92);
+});
+
+test("document secondary text stays above the wave", async () => {
+  for (const { id } of listThemes()) {
+    const result = await render({ nodes: [{ id: "doc", kind: "document", label: "Временный файл", note: "Потоковая запись на диск" }] }, { theme: id });
+    const node = result.model.nodes[0];
+    const text = result.svg.match(/<text[^>]*y="([\d.]+)"[^>]*>Потоковая запись на диск<\/text>/);
+    assert.ok(text, id);
+    const noteBottom = Number(text[1]) - result.theme.canvas.padding + result.theme.fonts.note.size * (result.theme.fonts.note.lineHeight ?? 1.35) / 2;
+    for (let x = 0; x <= node.w; x += node.w / 16) {
+      assert.ok(noteBottom < borderAt("document", node, result.theme, "bottom", x) - 3, `${id}: document note intersects the wave`);
+    }
+  }
 });

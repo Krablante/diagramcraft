@@ -81,6 +81,7 @@
     "shadow": null,
     "glow": null,
     "shine": null,
+    "glass": null,
     "kinds": {
       "terminal": {
         "fill": {
@@ -209,6 +210,7 @@
     "pad": 22,
     "labelPad": 10,
     "labelColor": null,
+    "labelFill": null,
     "padY": 12
   },
   "heading": {

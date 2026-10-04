@@ -10,7 +10,7 @@ import { deepMerge } from "./util.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const builtinDir = join(here, "..", "themes");
 // Keep saved specs using retired theme ids renderable without cluttering listings.
-const aliases = new Map([["glass", "light"], ["midnight", "dark"]]);
+const aliases = new Map([["midnight", "dark"]]);
 
 export class ThemeError extends Error {}
 
@@ -70,6 +70,14 @@ export function mergeTheme(raw) {
   }
   for (const [section, keys] of Object.entries({ canvas: ["padding", "minWidth"], node: ["minWidth", "maxTextWidth", "padX", "padY"], layout: ["nodeGap", "rankGap", "edgeGap"] })) {
     for (const key of keys) if (!Number.isFinite(theme[section][key]) || theme[section][key] < 0 || (key === "maxTextWidth" && theme[section][key] === 0)) throw new ThemeError(`theme ${raw.id}: ${section}.${key} must be ${key === "maxTextWidth" ? "positive" : "nonnegative"}`);
+  }
+  for (const [path, glass] of [["node.glass", theme.node.glass], ...Object.entries(theme.node.kinds ?? {}).map(([kind, value]) => [`node.kinds.${kind}.glass`, value?.glass])]) {
+    if (glass == null) continue;
+    if (typeof glass !== "object" || Array.isArray(glass)) throw new ThemeError(`theme ${raw.id}: ${path} must be an object or null`);
+    for (const key of ["refraction", "edgeRefraction", "bevelWidth", "rimWidth"]) {
+      const positive = key === "refraction" || key === "edgeRefraction";
+      if (glass[key] !== undefined && (!Number.isFinite(glass[key]) || (positive ? glass[key] <= 0 : glass[key] < 0))) throw new ThemeError(`theme ${raw.id}: ${path}.${key} must be ${positive ? "positive" : "nonnegative"}`);
+    }
   }
   return theme;
 }

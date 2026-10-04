@@ -97,6 +97,9 @@ export function renderSvg(model, theme, spec, options = {}) {
 
   /** @type {string[]} */
   const layers = [];
+  // A shared backdrop supplies vector lenses; it never contains text or edges.
+  // Reusing it avoids a canvas-sized blur/displacement filter for every node.
+  const backdrop = [];
 
   // ---- canvas background -------------------------------------------------
   if (!options.transparent) {
@@ -132,6 +135,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     } else {
       layers.push(...bgLayers);
     }
+    backdrop.push(...bgLayers);
   }
 
   /** @param {any} texture @param {string} id */
@@ -151,6 +155,11 @@ export function renderSvg(model, theme, spec, options = {}) {
       const radius = round(texture.radius ?? 1.1);
       return `<pattern id="${id}" width="${size}" height="${size}" patternUnits="userSpaceOnUse"><circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="${stroke}"/></pattern>`;
     }
+    if (texture.type === "contours") {
+      const size = texture.size ?? 96;
+      const paths = [size / 4, size * 3 / 4].map(y => `M${round(-size)},${round(y)} C${round(-size / 2)},${round(y - size / 3)} ${round(-size / 2)},${round(y + size / 3)} 0,${round(y)} S${round(size / 2)},${round(y - size / 3)} ${round(size)},${round(y)} S${round(size * 1.5)},${round(y + size / 3)} ${round(size * 2)},${round(y)} S${round(size * 2.5)},${round(y - size / 3)} ${round(size * 3)},${round(y)}`);
+      return `<pattern id="${id}" width="${round(size * 2)}" height="${round(size)}" patternUnits="userSpaceOnUse"><path d="${paths.join(" ")}" fill="none" stroke="${escapeXml(texture.color ?? "rgba(0,0,0,0.08)")}" stroke-width="${round(texture.width ?? 1)}"/></pattern>`;
+    }
     throw new Error(`unknown texture type ${JSON.stringify(texture.type)}`);
   }
 
@@ -163,16 +172,16 @@ export function renderSvg(model, theme, spec, options = {}) {
     const dash = stroke.dash ? ` stroke-dasharray="${escapeXml(stroke.dash.join(" "))}"` : "";
     const zx = zone.x + originX;
     const zy = zone.y + originY;
-    layers.push(
-      `<g><rect x="${round(zx)}" y="${round(zy)}" width="${round(zone.w)}" height="${round(zone.h)}" rx="${round(theme.zone.radius)}" fill="${paintValue(zoneFill)}" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"${dash}/>`,
-    );
+    const zoneRect = `<rect x="${round(zx)}" y="${round(zy)}" width="${round(zone.w)}" height="${round(zone.h)}" rx="${round(theme.zone.radius)}" fill="${paintValue(zoneFill)}" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"${dash}/>`;
+    layers.push(`<g>${zoneRect}`);
+    if (backdrop.length) backdrop.push(zoneRect);
     const label = zoneFont.uppercase ? zone.label.toUpperCase() : zone.label;
     const labelColor = theme.zone.labelColor ?? zoneFont.color;
     const labelX = zx + theme.zone.labelPad;
     const labelY = zy + theme.zone.labelPad;
     const labelHeight = (zoneFont.lineHeight ?? 1.35) * zoneFont.size;
     zoneLabels.push(
-      `<rect x="${round(labelX - 3)}" y="${round(labelY - labelHeight / 2)}" width="${round(widestLine([label], zoneFont) + 6)}" height="${round(labelHeight)}" fill="${paintValue(zoneFill)}"/>`,
+      `<rect x="${round(labelX - 3)}" y="${round(labelY - labelHeight / 2)}" width="${round(widestLine([label], zoneFont) + 6)}" height="${round(labelHeight)}" fill="${paintValue(theme.zone.labelFill ?? zoneFill)}"/>`,
       textLine(label, { ...zoneFont, color: labelColor }, labelX, labelY, "start"),
     );
     layers.push(`</g>`);
@@ -185,6 +194,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     let stroke = deepMerge(theme.node.stroke, kindTokens.stroke ?? {});
     const shadow = "shadow" in kindTokens ? kindTokens.shadow : theme.node.shadow;
     const glow = "glow" in kindTokens ? kindTokens.glow : theme.node.glow;
+    const glass = "glass" in kindTokens ? kindTokens.glass : theme.node.glass;
     let textColor = node.labelFont.color ?? theme.fonts.node.color;
     if (node.accent) {
       fill = theme.node.accent.fill ?? fill;
@@ -192,7 +202,7 @@ export function renderSvg(model, theme, spec, options = {}) {
       textColor = theme.node.accent.text?.color ?? textColor;
     }
     if (node.color) fill = { type: "solid", color: node.color };
-    return { fill, stroke, shadow, glow, textColor };
+    return { fill, stroke, shadow, glow, glass, textColor };
   }
 
   // Node shadows and glows render behind the edges so arrowheads stay crisp.
@@ -267,14 +277,43 @@ export function renderSvg(model, theme, spec, options = {}) {
 
   // ---- nodes ---------------------------------------------------------------
   for (const node of model.nodes) {
-    const { fill, stroke, textColor } = resolveNodeStyle(node);
+    const { fill, stroke, glass, textColor } = resolveNodeStyle(node);
     const x = node.x + originX;
     const y = node.y + originY;
     const dash = stroke.dash ? ` stroke-dasharray="${escapeXml(stroke.dash.join(" "))}"` : "";
     const common = `fill="${paintValue(fill)}" stroke="${escapeXml(stroke.color ?? "none")}" stroke-width="${round(stroke.width ?? 0)}"${dash}`;
     const group = [`<g data-node="${escapeXml(node.id)}">`];
 
-    group.push(shapePath(node.kind, x, y, node.w, node.h, theme, common));
+    if (glass) {
+      const clipId = define(`lens:${node.id}`, (id) => `<clipPath id="${id}">${shapePath(node.kind, x, y, node.w, node.h, theme, 'fill="#ffffff" stroke="none"')}</clipPath>`);
+      if (backdrop.length) {
+        const backdropId = define("backdrop", (id) => `<g id="${id}">${backdrop.join("")}</g>`);
+        const zoom = glass.refraction ?? 1.14;
+        const cx = x + node.w / 2;
+        const cy = y + node.h / 2;
+        const edgeZoom = glass.edgeRefraction ?? zoom;
+        const inset = Math.min((glass.bevelWidth ?? 6) / 2, node.w / 4, node.h / 4);
+        // Pattern viewports bound native raster work to this node's rectangle.
+        // Direct clipped canvas-sized <use> layers allocate full-canvas masks.
+        const lens = (factor) => {
+          const id = define(`lens-paint:${node.id}:${factor}`, (defId) => `<pattern id="${defId}" x="${round(x)}" y="${round(y)}" width="${round(node.w)}" height="${round(node.h)}" patternUnits="userSpaceOnUse" viewBox="${round(x)} ${round(y)} ${round(node.w)} ${round(node.h)}" preserveAspectRatio="none"><use href="#${backdropId}" transform="translate(${round(cx * (1 - factor))} ${round(cy * (1 - factor))}) scale(${round(factor)})"/></pattern>`);
+          return `fill="url(#${id})" stroke="none"`;
+        };
+        let centre = "";
+        if (edgeZoom !== zoom && inset > 0) {
+          centre = shapePath(node.kind, x + inset, y + inset, node.w - inset * 2, node.h - inset * 2, theme, lens(zoom));
+        }
+        group.push(`<g data-lens="${escapeXml(node.id)}">${shapePath(node.kind, x, y, node.w, node.h, theme, lens(edgeZoom))}${centre}</g>`);
+      }
+      // Both the bevel and its directional rim sit inside the real outline.
+      // The node's normal paint is a translucent tint over the refracted view.
+      group.push(shapePath(node.kind, x, y, node.w, node.h, theme, common));
+      const bevel = `fill="none" stroke="${paintValue(glass.bevel)}" stroke-width="${round(glass.bevelWidth ?? 6)}"`;
+      const rim = `fill="none" stroke="${paintValue(glass.rim)}" stroke-width="${round(glass.rimWidth ?? 1.5)}"`;
+      group.push(`<g data-glass="${escapeXml(node.id)}" clip-path="url(#${clipId})">${shapePath(node.kind, x, y, node.w, node.h, theme, bevel)}${shapePath(node.kind, x, y, node.w, node.h, theme, rim)}</g>`);
+    } else {
+      group.push(shapePath(node.kind, x, y, node.w, node.h, theme, common));
+    }
     if (node.kind === "database") {
       const ry = Math.min(11, node.h * 0.2);
       const cx = x + node.w / 2;
@@ -294,6 +333,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     const noteHeight = node.noteLines.length ? 5 + blockHeight(node.noteLines, noteFont) : 0;
     const totalHeight = blockHeight(node.lines, node.labelFont) + noteHeight;
     let cursor = y + (node.h - totalHeight) / 2 + (node.kind === "database" ? Math.min(11, node.h * 0.2) / 2 : 0);
+    if (node.kind === "document") cursor -= Math.min(12, node.h * 0.18) / 2;
     if (node.kind !== "junction") {
       for (const line of node.lines) {
         group.push(textLine(line, { ...node.labelFont, color: textColor }, x + node.w / 2, cursor + lineHeight / 2, "middle"));

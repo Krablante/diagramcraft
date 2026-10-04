@@ -9,7 +9,7 @@ Dorpie is one package: CLI, Node library and plugin share the renderer and saved
 Node 20+ is required for the CLI. Install the release, then connect the plugin:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 dorpie plugin install --app opencodez
 # For upstream OpenCode instead:
 # dorpie plugin install --app opencode
@@ -23,7 +23,7 @@ For recent loaders that support package `./server` entrypoints, you can instead 
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz"
+    "https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz"
   ]
 }
 ```
@@ -52,7 +52,7 @@ The plugin reads the same [Dorpie config](./library.md#configuration) as the CLI
 ```json
 {
   "plugin": [[
-    "https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz",
+    "https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz",
     { "libraryDir": "~/diagrams/library", "exportDir": "~/diagrams/exports" }
   ]]
 }

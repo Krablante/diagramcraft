@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Install it from a release tarball or straight from the repository:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 # or, tracking main:
 npm install github:Krablante/dorpie
 ```

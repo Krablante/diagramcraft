@@ -8,7 +8,7 @@ This page is written for AI agents and for people who configure them. Everything
 
 ```sh
 # global install from the release tarball
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.5.0/dorpie-0.5.0.tgz
 
 # or run straight from a checkout, no install
 node /path/to/dorpie/bin/dorpie.js <command>
@@ -48,7 +48,8 @@ You can create and edit diagrams with the dorpie CLI.
 - Inspect the PNG yourself (vision) or the ASCII before claiming success.
 - Choose a theme by intent: classic (standard), mono (black-and-white), light
   or dark (document background), paper (textured print), vivid (colour-coded),
-  blueprint (technical grid), copper (warm depth). List with `dorpie themes`.
+  blueprint (technical grid), copper (warm depth), glass (Liquid Glass with
+  refracted background and transparent surfaces). List with `dorpie themes`.
 - Keep labels short; use `note` for detail; use edge labels yes/no on decisions;
   use groups for phases, not decoration.
 ```
@@ -65,6 +66,7 @@ You can create and edit diagrams with the dorpie CLI.
 | engineering, infrastructure, technical docs | `blueprint` |
 | printing, photocopies, strict monochrome | `mono` |
 | warm presentation diagrams with texture and depth | `copper` |
+| transparent glass surfaces with refraction and bright rims | `glass` |
 
 ## Writing specs that render well
 

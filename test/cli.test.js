@@ -81,7 +81,8 @@ test("themes lists built-ins and prints one theme", () => {
   const themes = JSON.parse(listed.stdout);
   assert.ok(themes.some((theme) => theme.id === "light"));
   assert.ok(themes.some((theme) => theme.id === "dark"));
-  assert.ok(!themes.some((theme) => theme.id === "glass" || theme.id === "midnight"));
+  assert.ok(themes.some((theme) => theme.id === "glass" && theme.title === "Liquid Glass"));
+  assert.ok(!themes.some((theme) => theme.id === "midnight"));
 
   const one = run(["themes", "paper"]);
   assert.equal(one.status, 0, one.stderr);

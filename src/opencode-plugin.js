@@ -24,7 +24,7 @@ export default {
     return {
       tool: {
         dorpie_help: {
-          description: "Get Dorpie's JSON diagram schema, built-in visual themes, or library settings. Use schema before creating your first diagram. Edit only JSON sources; inspect the exported PNG and refine the spec. Saved diagrams persist across sessions.",
+          description: "Get Dorpie's JSON diagram schema, built-in visual themes (including Liquid Glass), or library settings. Use schema before creating your first diagram. Edit only JSON sources; inspect the exported PNG and refine the spec. Saved diagrams persist across sessions.",
           args: { topic: z.enum(["schema", "themes", "settings"]) },
           async execute(args) {
             if (args.topic === "schema") return { output: await readFile(new URL("../schema/diagram.schema.json", import.meta.url), "utf8") };
