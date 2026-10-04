@@ -1,14 +1,14 @@
 <h1 align="center">Dorpie</h1>
 
 <p align="center"><strong>Опишите в JSON. Получите диаграмму. Вернитесь к ней в следующей сессии.</strong><br>
-Семь визуальных тем · SVG, PNG и ASCII · CLI, Node API и инструменты OpenCode</p>
+Восемь визуальных тем · SVG, PNG и ASCII · CLI, Node API и инструменты OpenCode</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
 </p>
 
 <p align="center">
-  <img alt="Схема transformer-блока в теме Glass" src="./docs/gallery/transformer-block.png" width="560">
+  <img alt="Схема выпуска в теме Copper" src="./docs/gallery/theme-copper.png" width="560">
 </p>
 
 Dorpie — консольная утилита, библиотека для Node и плагин OpenCode/OpenCodez: она рендерит диаграмму, описанную одним JSON-файлом, в SVG, PNG и ASCII. Спека — источник истины: вы один раз описываете узлы и связи и рендерите из них все форматы, так что «добавить ещё один блок» остаётся правкой в две строки, а не перерисовкой. Сохранённые диаграммы хранят версии исходников и историю экспортов между сессиями агента.
@@ -20,7 +20,7 @@ Dorpie — консольная утилита, библиотека для Node
 Нужен Node 20 или новее. Пакет распространяется как tarball во вложениях GitHub-релизов:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
 dorpie --version
 ```
 
@@ -65,7 +65,7 @@ dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
 }
 ```
 
-`dorpie validate spec.json` проверяет спеку без рендера и показывает все проблемы с JSON-путями. Флаги CLI перекрывают спеку: `dorpie render spec.json --theme glass --format png --scale 2 --out out/`. Полный справочник команд — в [docs/cli.ru.md](./docs/cli.ru.md).
+`dorpie validate spec.json` проверяет спеку без рендера и показывает все проблемы с JSON-путями. Флаги CLI перекрывают спеку: `dorpie render spec.json --theme light --format png --scale 2 --out out/`. Полный справочник команд — в [docs/cli.ru.md](./docs/cli.ru.md).
 
 Для работы, к которой нужно вернуться позже, используйте `dorpie save spec.json --name "Deploy flow"`, затем `dorpie export <полученный-id>`. Команды `dorpie list`, `get` и `history` находят прежние диаграммы и их версии. CLI и плагин используют одну настраиваемую библиотеку; экспорты сохраняют собственные файлы, снимок исходника и тему. См. [сохранённые диаграммы и настройки](./docs/library.ru.md).
 
@@ -77,19 +77,21 @@ dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
 
 ## Темы
 
-Каждая тема — это целостная система: шрифты, толщины линий, заливки узлов, стрелки, фон, текстуры и композиция. Выбирайте по задаче:
+Classic подходит для привычных блок-схем, Mono — для чёрно-белой печати, Light и Dark — под фон документа. Paper и Copper добавляют тонкую фактуру и неглубокие тени, Blueprint — сдержанную чертёжную сетку. В Vivid цвет помогает различать виды узлов, а формы остаются читаемыми.
 
 | | |
 |---|---|
 | ![Classic](./docs/gallery/theme-classic.png) **Classic** — нейтральные блок-схемы, чёткие и привычные | ![Mono](./docs/gallery/theme-mono.png) **Mono** — чёрно-белая печать, моноширинный шрифт |
-| ![Paper](./docs/gallery/theme-paper.png) **Paper** — тёплая печатная страница, антиква, зерно бумаги | ![Glass](./docs/gallery/theme-glass.png) **Glass** — жидкое стекло поверх цветных полей |
-| ![Midnight](./docs/gallery/theme-midnight.png) **Midnight** — тёмно-синий холст, мягкое свечение | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — цветовое кодирование форм, индиго-акцент |
-| ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — инженерная сетка, техничные линии | ![Node shapes](./docs/gallery/node-shapes.png) **Все формы** — terminal, decision, data, document, database, connector, note, junction |
+| ![Light](./docs/gallery/theme-light.png) **Light** — мягкий серый фон, белые узлы, сдержанный синий | ![Dark](./docs/gallery/theme-dark.png) **Dark** — графитовые поверхности, чёткие контуры, светло-синий акцент |
+| ![Paper](./docs/gallery/theme-paper.png) **Paper** — светлая бумажная фактура, антиква, лёгкий рельеф | ![Copper](./docs/gallery/theme-copper.png) **Copper** — графитовая фактура, тёплые блики, объёмные поверхности |
+| ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — приглушённые цвета по видам узлов, зелёный акцент | ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — тонкая синяя сетка, чертёжные линии, открытые стрелки |
+
+Прежние id `glass` и `midnight` выбирают `light` и `dark`. Старые спеки продолжают рендериться; новые экспорты записывают тему-замену. Ранее сохранённые экспорты сохраняют исходные файлы и снимки тем. См. [все формы узлов](./docs/gallery/node-shapes.png) и [справочник тем](./docs/themes.ru.md).
 
 Темы — это данные. Возьмите встроенную тему за основу: `dorpie themes paper > my-theme.json`, меняйте что нужно и рендерите с `--theme my-theme.json`. Небольшие правки можно оставить в спеке:
 
 ```json
-{ "theme": "glass", "style": { "fonts": { "title": { "color": "#4338ca" } } } }
+{ "theme": "light", "style": { "fonts": { "title": { "color": "#305b85" } } } }
 ```
 
 Полный справочник токенов и руководство по созданию темы — в [docs/themes.ru.md](./docs/themes.ru.md).
@@ -109,7 +111,7 @@ dorpie render hello.json    # пишет hello.svg, hello.png и hello.txt
 import { render } from "dorpie";
 
 const { svg, png, ascii } = await render(spec, {
-  theme: "glass",                 // встроенный id или путь к JSON-файлу темы
+  theme: "light",                 // встроенный id или путь к JSON-файлу темы
   formats: ["svg", "png", "ascii"],
 });
 ```
@@ -122,7 +124,8 @@ const { svg, png, ascii } = await render(spec, {
 - `examples/buro-draft-workflow.json` — как изменение попадает в реестр с проверкой ревизий (Paper)
 - `examples/opencodez-release.json` — выпуск от апстрим-тега до проверенных хостов (Vivid, с зонами)
 - `examples/opencodebot-artifact.json` — как файл попадает в Telegram-топик (Blueprint)
-- `examples/transformer-block.json` — residual-блок трансформера со слияниями на junction (Glass)
+- `examples/transformer-block.json` — residual-блок трансформера со слияниями на junction (Light)
+- `examples/theme-preview.json` — выпуск с группой, развилками, заметками и акцентом; общая схема для сравнения тем
 - `examples/node-shapes.json` — все виды узлов на одной схеме
 
 ## Документация

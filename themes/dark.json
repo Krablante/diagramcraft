@@ -1,0 +1,49 @@
+{
+  "id": "dark",
+  "title": "Dark",
+  "description": "Dark documents and slides: charcoal surfaces, clear outlines and a pale blue accent.",
+  "tags": ["dark", "presentation"],
+  "order": 4,
+  "canvas": {
+    "background": { "type": "solid", "color": "#202124" }
+  },
+  "fonts": {
+    "title": { "color": "#f1f3f5" },
+    "subtitle": { "color": "#bec3cb" },
+    "node": { "color": "#f1f3f5" },
+    "note": { "color": "#bec3cb" },
+    "edge": { "color": "#d0d5dd" },
+    "zone": { "color": "#bec3cb" },
+    "footer": { "color": "#bec3cb" }
+  },
+  "node": {
+    "radius": 8,
+    "fill": { "type": "solid", "color": "#2c2e33" },
+    "stroke": { "color": "#9da5b0", "width": 1.3 },
+    "kinds": {
+      "terminal": { "fill": { "type": "solid", "color": "#383c43" } },
+      "decision": { "fill": { "type": "solid", "color": "#2c2e33" } },
+      "data": { "fill": { "type": "solid", "color": "#2c2e33" } },
+      "document": { "fill": { "type": "solid", "color": "#2c2e33" } },
+      "database": { "fill": { "type": "solid", "color": "#2c2e33" } },
+      "connector": { "fill": { "type": "solid", "color": "#2c2e33" } },
+      "note": { "fill": { "type": "solid", "color": "#38352d" }, "stroke": { "color": "#b6a37e", "width": 1.2, "dash": [4, 3] } },
+      "junction": { "fill": { "type": "solid", "color": "#bec3cb" }, "stroke": { "color": "#bec3cb", "width": 0 } }
+    },
+    "accent": {
+      "fill": { "type": "solid", "color": "#b8cde5" },
+      "stroke": { "color": "#b8cde5", "width": 1.3 },
+      "text": { "color": "#202124" }
+    }
+  },
+  "edge": {
+    "stroke": { "color": "#adb5c0", "width": 1.5 },
+    "cornerRadius": 6,
+    "label": { "fill": "#202124" }
+  },
+  "zone": {
+    "fill": { "type": "solid", "color": "#26282d" },
+    "stroke": { "color": "#7d8591", "width": 1, "dash": [6, 5] },
+    "radius": 8
+  }
+}

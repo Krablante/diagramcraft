@@ -1,0 +1,52 @@
+{
+  "id": "copper",
+  "title": "Copper",
+  "description": "Warm presentation diagrams: charcoal grain, copper highlights and softly raised surfaces.",
+  "tags": ["dark", "presentation", "textured", "serif"],
+  "order": 8,
+  "canvas": {
+    "background": { "type": "linear", "angle": 105, "stops": [[0, "#292623"], [1, "#1e2023"]] },
+    "texture": { "type": "noise", "opacity": 0.035, "scale": 0.65, "seed": 11 },
+    "padding": 48
+  },
+  "fonts": {
+    "title": { "family": "Source Serif 4", "size": 30, "weight": 600, "color": "#f4e7d8" },
+    "subtitle": { "color": "#d2c3b2" },
+    "node": { "color": "#f5eee5" },
+    "note": { "color": "#d2c3b2" },
+    "edge": { "color": "#dfccb6" },
+    "zone": { "color": "#dfccb6" },
+    "footer": { "color": "#d2c3b2" }
+  },
+  "node": {
+    "radius": 6,
+    "fill": { "type": "linear", "angle": 90, "stops": [[0, "#3c3732"], [1, "#2e2c2a"]] },
+    "stroke": { "color": "#b29b82", "width": 1.3 },
+    "shadow": { "color": "#000000", "opacity": 0.25, "blur": 3, "y": 3 },
+    "kinds": {
+      "terminal": { "fill": { "type": "linear", "angle": 90, "stops": [[0, "#484036"], [1, "#39332d"]] } },
+      "decision": { "fill": { "type": "linear", "angle": 90, "stops": [[0, "#3c3732"], [1, "#2e2c2a"]] } },
+      "data": { "fill": { "type": "linear", "angle": 90, "stops": [[0, "#3c3732"], [1, "#2e2c2a"]] } },
+      "document": { "fill": { "type": "linear", "angle": 90, "stops": [[0, "#3c3732"], [1, "#2e2c2a"]] } },
+      "database": { "fill": { "type": "linear", "angle": 90, "stops": [[0, "#3c3732"], [1, "#2e2c2a"]] } },
+      "connector": { "fill": { "type": "solid", "color": "#39332d" } },
+      "note": { "fill": { "type": "solid", "color": "#443b30" }, "stroke": { "color": "#c0a27f", "width": 1.2, "dash": [4, 3] } },
+      "junction": { "fill": { "type": "solid", "color": "#dfb684" }, "stroke": { "color": "#dfb684", "width": 0 }, "shadow": null }
+    },
+    "accent": {
+      "fill": { "type": "linear", "angle": 90, "stops": [[0, "#e7c59c"], [1, "#cfa16d"]] },
+      "stroke": { "color": "#e7c59c", "width": 1.3 },
+      "text": { "color": "#28221b" }
+    }
+  },
+  "edge": {
+    "stroke": { "color": "#c6ad91", "width": 1.5 },
+    "cornerRadius": 4,
+    "label": { "fill": "#292623", "radius": 2 }
+  },
+  "zone": {
+    "fill": { "type": "solid", "color": "#302c28" },
+    "stroke": { "color": "#94816d", "width": 1, "dash": null },
+    "radius": 6
+  }
+}

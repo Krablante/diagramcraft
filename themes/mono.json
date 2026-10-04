@@ -3,7 +3,7 @@
   "title": "Mono",
   "description": "Black-and-white print diagram: monospace type, square corners, zero colour.",
   "tags": ["print", "monochrome", "monospace"],
-  "order": 7,
+  "order": 2,
   "canvas": {
     "background": { "type": "solid", "color": "#ffffff" },
     "padding": 44,
@@ -12,13 +12,14 @@
   "fonts": {
     "title": { "family": "JetBrains Mono", "size": 23, "weight": 700, "color": "#000000" },
     "subtitle": { "family": "JetBrains Mono", "size": 12.5, "weight": 400, "color": "#444444" },
-    "node": { "family": "JetBrains Mono", "size": 13, "weight": 400, "color": "#000000" },
-    "note": { "family": "JetBrains Mono", "size": 11, "weight": 400, "color": "#555555" },
-    "edge": { "family": "JetBrains Mono", "size": 10.5, "weight": 400, "color": "#000000" },
-    "zone": { "family": "JetBrains Mono", "size": 10, "weight": 700, "color": "#333333", "spacing": 0.6, "uppercase": true }
+    "node": { "family": "JetBrains Mono", "size": 14, "weight": 400, "color": "#000000" },
+    "note": { "family": "JetBrains Mono", "size": 12, "weight": 400, "color": "#555555" },
+    "edge": { "family": "JetBrains Mono", "size": 11.5, "weight": 400, "color": "#000000" },
+    "zone": { "family": "JetBrains Mono", "size": 11.5, "weight": 700, "color": "#333333" },
+    "footer": { "family": "JetBrains Mono", "size": 11.5, "weight": 400, "color": "#555555" }
   },
   "node": {
-    "radius": 2,
+    "radius": 0,
     "padX": 16,
     "padY": 11,
     "fill": { "type": "solid", "color": "#ffffff" },
@@ -42,11 +43,8 @@
     "label": { "fill": "#ffffff", "radius": 0 }
   },
   "zone": {
-    "fill": { "type": "solid", "color": "rgba(0,0,0,0.03)" },
-    "stroke": { "color": "rgba(0,0,0,0.55)", "width": 1, "dash": [4, 3] },
+    "fill": { "type": "solid", "color": "#f5f5f5" },
+    "stroke": { "color": "#777777", "width": 1, "dash": [4, 3] },
     "radius": 0
-  },
-  "heading": {
-    "rule": { "color": "#000000", "width": 2, "length": 56, "gap": 10 }
   }
 }

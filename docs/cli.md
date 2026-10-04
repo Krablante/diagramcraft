@@ -57,7 +57,7 @@ dorpie render spec.json
 dorpie render spec.json --format svg,png --out out/
 
 # one format to one file, with theme and scale overrides
-dorpie render spec.json --format png --theme glass --scale 3 --out out/diagram.png
+dorpie render spec.json --format png --theme light --scale 3 --out out/diagram.png
 
 # spec from stdin, ASCII to stdout
 cat spec.json | dorpie render - --format ascii --out - > diagram.txt

@@ -44,7 +44,24 @@ function sizeNode(node, theme) {
   if (node.kind === "decision") w = Math.round(w * 1.28);
   if (node.kind === "data") w = Math.round(w * 1.14);
   let h = padY * 2 + blockHeight(lines, nodeFont) + (noteLines.length ? 5 + blockHeight(noteLines, noteFont) : 0);
-  if (node.kind === "decision") h = Math.round(h * 1.16);
+  if (node.kind === "decision") {
+    // A diamond narrows towards its top and bottom. Fit each text line's
+    // bounds inside those slopes instead of treating it as a rectangle.
+    const textHeight = h - padY * 2;
+    let cursor = -textHeight / 2;
+    let requiredHeight = h * 1.16;
+    for (const { textLines, font } of [{ textLines: lines, font: nodeFont }, { textLines: noteLines, font: noteFont }]) {
+      if (textLines === noteLines && noteLines.length) cursor += 5;
+      const lineHeight = (font.lineHeight ?? 1.35) * font.size;
+      for (const line of textLines) {
+        const extentY = Math.abs(cursor + lineHeight / 2) + lineHeight / 2 + padY / 2;
+        const fractionX = (measureText(line, font) + padX) / w;
+        requiredHeight = Math.max(requiredHeight, 2 * extentY / (1 - fractionX));
+        cursor += lineHeight;
+      }
+    }
+    h = Math.ceil(requiredHeight);
+  }
   if (node.kind === "database") h += 22; // Keep text below the cylinder's top cap.
 
   return {

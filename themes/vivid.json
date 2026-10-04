@@ -1,54 +1,25 @@
 {
   "id": "vivid",
   "title": "Vivid",
-  "description": "White canvas, colour-coded shapes and a strong indigo accent.",
-  "tags": ["colour", "modern", "light"],
-  "order": 5,
-  "canvas": {
-    "background": { "type": "solid", "color": "#ffffff" },
-    "blobs": [
-      { "cx": 0.04, "cy": 0.02, "r": 0.5, "color": "#6366f1", "opacity": 0.1 },
-      { "cx": 0.98, "cy": 0.98, "r": 0.55, "color": "#f43f5e", "opacity": 0.07 }
-    ],
-    "padding": 46,
-    "radius": 12
-  },
-  "fonts": {
-    "title": { "family": "Inter", "size": 27, "weight": 600, "color": "#111827" },
-    "subtitle": { "family": "Inter", "size": 14, "weight": 400, "color": "#6b7280" },
-    "node": { "family": "Inter", "size": 15, "weight": 500, "color": "#111827" },
-    "edge": { "family": "Inter", "size": 11.5, "weight": 500, "color": "#4b5563" }
-  },
+  "description": "Colour-coded flowcharts: flat muted fills, dark labels and a teal accent.",
+  "tags": ["colour", "flowchart", "light"],
+  "order": 6,
   "node": {
-    "radius": 12,
-    "fill": { "type": "solid", "color": "#ffffff" },
-    "stroke": { "color": "#94a3b8", "width": 1.5 },
-    "shadow": { "color": "#312e81", "opacity": 0.12, "blur": 12, "y": 4 },
+    "radius": 6,
+    "fill": { "type": "solid", "color": "#eef3f8" },
+    "stroke": { "color": "#59718b", "width": 1.5 },
     "kinds": {
-      "terminal": { "fill": { "type": "solid", "color": "#ecfdf5" }, "stroke": { "color": "#10b981", "width": 1.5 } },
-      "decision": { "fill": { "type": "solid", "color": "#eef2ff" }, "stroke": { "color": "#6366f1", "width": 1.5 } },
-      "data": { "fill": { "type": "solid", "color": "#fffbeb" }, "stroke": { "color": "#f59e0b", "width": 1.5 } },
-      "document": { "fill": { "type": "solid", "color": "#f5f3ff" }, "stroke": { "color": "#8b5cf6", "width": 1.5 } },
-      "database": { "fill": { "type": "solid", "color": "#f0f9ff" }, "stroke": { "color": "#0284c7", "width": 1.5 } },
-      "note": { "fill": { "type": "solid", "color": "#fff7ed" }, "stroke": { "color": "#f97316", "width": 1.2, "dash": [5, 4] } }
+      "terminal": { "fill": { "type": "solid", "color": "#e6f1eb" }, "stroke": { "color": "#527864", "width": 1.5 } },
+      "decision": { "fill": { "type": "solid", "color": "#faf0d9" }, "stroke": { "color": "#977436", "width": 1.5 } },
+      "data": { "fill": { "type": "solid", "color": "#e8f0f8" }, "stroke": { "color": "#59718b", "width": 1.5 } },
+      "document": { "fill": { "type": "solid", "color": "#efedf5" }, "stroke": { "color": "#75688d", "width": 1.5 } },
+      "database": { "fill": { "type": "solid", "color": "#e8f0f8" }, "stroke": { "color": "#59718b", "width": 1.5 } },
+      "note": { "fill": { "type": "solid", "color": "#faf0d9" }, "stroke": { "color": "#977436", "width": 1.2, "dash": [4, 3] } }
     },
     "accent": {
-      "fill": { "type": "linear", "angle": 120, "stops": [[0, "#4f46e5"], [1, "#7c3aed"]] },
-      "stroke": { "color": "#4338ca", "width": 1.5 },
+      "fill": { "type": "solid", "color": "#28695b" },
+      "stroke": { "color": "#28695b", "width": 1.5 },
       "text": { "color": "#ffffff" }
     }
-  },
-  "edge": {
-    "stroke": { "color": "#64748b", "width": 1.6 },
-    "cornerRadius": 9,
-    "label": { "fill": "#ffffff", "radius": 5 }
-  },
-  "zone": {
-    "fill": { "type": "solid", "color": "rgba(99,102,241,0.06)" },
-    "stroke": { "color": "rgba(99,102,241,0.35)", "width": 1, "dash": [6, 5] },
-    "radius": 14
-  },
-  "heading": {
-    "rule": { "color": "#4f46e5", "width": 3, "length": 56, "gap": 10 }
   }
 }

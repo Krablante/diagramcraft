@@ -2,7 +2,7 @@
 
 [English](./themes.md) · [Русский](./themes.ru.md) · [Home](../README.md)
 
-A theme is a JSON token set: fonts, colours, node paints, strokes, shadows, edge styles, zone styling, background treatment and spacing defaults. The renderer implements a fixed vocabulary of primitives, and themes compose them. That is why themes can look genuinely different without touching code.
+A theme is a JSON token set: fonts, colours, node paints, strokes, shadows, edge styles, zone styling, background treatment and spacing defaults. The renderer implements a fixed vocabulary of primitives, and themes compose them. Themes can look different without touching code.
 
 Every built-in theme merges over [`themes/_base.json`](../themes/_base.json), which holds all defaults. A custom theme only needs to override what it changes, but it must define a non-empty `id` and `title`. `dorpie themes classic` prints a full resolved theme if you want to see every token at once.
 
@@ -34,12 +34,17 @@ Arrays (like gradient stops) are replaced, not merged.
 | Id | Intent |
 | --- | --- |
 | `classic` | neutral flowcharts; white canvas, crisp lines, blue accent |
-| `paper` | warm printed page; serif type, ink lines, grain and vignette |
-| `glass` | liquid glass; colour fields, frosted translucent cards, highlights |
-| `midnight` | dark navy canvas, soft glows and cyan accents |
-| `vivid` | colour-coded shapes on white, strong indigo accent |
-| `blueprint` | engineering drawing; grid paper, monospace, thin technical lines |
 | `mono` | black-and-white print; monospace, square corners, zero colour |
+| `light` | soft grey canvas, white nodes and restrained blue; light documents and slides |
+| `dark` | charcoal surfaces, clear outlines and pale blue; dark documents and slides |
+| `paper` | ivory paper grain, serif labels, warm ink and shallow relief; editorial diagrams |
+| `vivid` | muted fills by node kind, dark labels and a teal accent; colour-coded flowcharts |
+| `blueprint` | fine blue grid, opaque shapes, monospace labels and open arrows; technical drawings |
+| `copper` | charcoal grain, copper highlights and raised surfaces; warm presentation diagrams |
+
+Classic, Mono, Light, Dark and Vivid use flat fills without filters. Paper and Copper use fine grain and small shadows; Blueprint keeps a low-contrast grid outside the shapes. All use bundled fonts and run locally.
+
+`glass` and `midnight` are compatibility ids for `light` and `dark`, omitted from listings. `getTheme` and new exports return the replacement theme id. Saved source revisions keep their original spec; existing exports keep their files and resolved theme snapshots. To reproduce an older appearance, pass its archived `theme.json` as a custom theme file.
 
 `dorpie themes --json` also returns `description`, `tags`, `title` and `order` for each theme. Metadata never affects rendering except `order`, which sorts the listings.
 
@@ -107,7 +112,7 @@ To add a font for a fork: drop the TTF into `assets/fonts/`, add it to the `know
 | `glow` | `{ color, blur }` or `null`; adds a soft halo. |
 | `shine` | Paint overlay for glass-style highlights, or `null`. |
 | `kinds.<kind>` | Per-kind `fill`, `stroke`, `shadow` and `glow`, plus `size` for `connector` and `junction`. |
-| `accent` | `{ fill, stroke, text: { color } }` used by `accent: true` nodes. |
+| `accent` | `{ fill, stroke, text: { color }, note?: { color } }` used by `accent: true` nodes. Secondary text follows the accent text colour unless `note.color` overrides it. |
 
 ### `edge`
 
@@ -151,34 +156,34 @@ A minimal custom theme — everything else comes from the built-in base:
 
 ```json
 {
-  "id": "terminal",
-  "title": "Terminal",
-  "description": "Green on black, monospace",
-  "tags": ["dark", "monospace"],
+  "id": "sage",
+  "title": "Sage",
+  "description": "Light diagrams with a green accent",
+  "tags": ["light"],
   "order": 20,
   "canvas": {
-    "background": { "type": "solid", "color": "#0b0f0c" },
-    "texture": { "type": "grid", "color": "rgba(74,222,128,0.08)", "size": 24 }
-  },
-  "fonts": {
-    "title": { "family": "JetBrains Mono", "size": 24, "weight": 700, "color": "#bbf7d0" },
-    "node": { "family": "JetBrains Mono", "size": 13, "weight": 400, "color": "#d1fae5" },
-    "edge": { "family": "JetBrains Mono", "size": 10.5, "weight": 400, "color": "#4ade80" }
+    "background": { "type": "solid", "color": "#f5f8f5" },
+    "texture": { "type": "dots", "color": "rgba(70,109,89,0.07)", "size": 24, "radius": 1 }
   },
   "node": {
-    "radius": 4,
-    "fill": { "type": "solid", "color": "#052e16" },
-    "stroke": { "color": "#22c55e", "width": 1.3 },
-    "shadow": null
+    "radius": 6,
+    "stroke": { "color": "#466d59", "width": 1.4 },
+    "accent": {
+      "fill": { "type": "solid", "color": "#315847" },
+      "stroke": { "color": "#315847", "width": 1.4 },
+      "text": { "color": "#ffffff" }
+    }
   },
   "edge": {
-    "stroke": { "color": "#22c55e", "width": 1.4 },
-    "arrow": { "type": "vee", "size": 10, "color": "#4ade80" }
+    "stroke": { "color": "#466d59", "width": 1.4 },
+    "label": { "fill": "#f5f8f5" }
   }
 }
 ```
 
-Save it as `terminal.json` and render with `--theme terminal.json`. Only `id` and `title` are required; `description`, `tags` and `order` are listing metadata with sensible defaults.
+Save it as `sage.json` and render with `--theme sage.json`. Only `id` and `title` are required; `description`, `tags` and `order` are listing metadata with sensible defaults.
+
+For a dark custom theme, start with `dorpie themes dark > my-theme.json`. Change all text roles and per-kind fills together; a dark canvas with inherited white shapes is not enough. Keep the texture away from labels, use shadows sparingly, and check every shape with `examples/node-shapes.json` plus groups and accent notes with `examples/theme-preview.json`.
 
 Rules of thumb for a cohesive theme:
 

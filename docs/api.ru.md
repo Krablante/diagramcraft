@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Установка из релизного tarball или прямо из репозитория:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
 # или, следя за main:
 npm install github:Krablante/dorpie
 ```
@@ -102,7 +102,7 @@ import { listThemes, getTheme, loadThemeFile, ThemeError } from "dorpie";
 listThemes();
 // [{ id, title, description, tags, order }, ...] в порядке отображения
 
-const theme = getTheme("glass");                  // раскрытая встроенная тема
+const theme = getTheme("light");                  // раскрытая встроенная тема
 const custom = loadThemeFile("./my-theme.json");  // раскрытая своя тема поверх базовых значений
 ```
 

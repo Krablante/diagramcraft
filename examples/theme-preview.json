@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "title": "Release workflow",
+  "subtitle": "Build, review and publish a version",
+  "theme": "classic",
+  "direction": "TB",
+  "nodes": [
+    { "id": "source", "kind": "data", "label": "Source change" },
+    { "id": "build", "label": "Build and test", "note": "Code, docs and package" },
+    { "id": "ready", "kind": "decision", "label": "Ready?" },
+    { "id": "revise", "label": "Revise the change" },
+    { "id": "publish", "kind": "terminal", "label": "Publish release", "note": "Version and checksums", "accent": true },
+    { "id": "artifacts", "kind": "database", "label": "Release archive" },
+    { "id": "review", "kind": "note", "label": "Review required", "note": "Check the visual output" }
+  ],
+  "edges": [
+    { "from": "source", "to": "build" },
+    { "from": "build", "to": "ready" },
+    { "from": "ready", "to": "publish", "label": "yes" },
+    { "from": "ready", "to": "revise", "label": "no" },
+    { "from": "revise", "to": "build", "kind": "dashed", "label": "retry" },
+    { "from": "publish", "to": "artifacts" },
+    { "from": "ready", "to": "review", "kind": "dotted", "arrow": "none" }
+  ],
+  "groups": [
+    { "id": "validation", "label": "Validation", "nodes": ["build", "ready"] }
+  ]
+}

@@ -13,7 +13,7 @@ dorpie list "Deploy flow"
 dorpie get <id> --spec > edited.json
 # Edit edited.json. Use the revision from get/history, not a guessed number.
 dorpie save edited.json --id <id> --expected-revision 1 --change "Add retry"
-dorpie export <id> --theme glass
+dorpie export <id> --theme light
 dorpie history <id>
 ```
 

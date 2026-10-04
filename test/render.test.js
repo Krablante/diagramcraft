@@ -15,7 +15,7 @@ const spec = JSON.parse(readFileSync(join(here, "..", "examples", "quickstart.js
 
 test("renders every built-in theme", async () => {
   const themes = listThemes();
-  assert.ok(themes.length >= 7, "expected at least seven built-in themes");
+  assert.ok(themes.length >= 8, "expected at least eight built-in themes");
   for (const theme of themes) {
     const result = await render(spec, { theme: theme.id, formats: ["svg", "ascii"] });
     assert.ok(result.svg.startsWith("<svg"), `${theme.id}: svg output`);
@@ -29,6 +29,26 @@ test("svg output is deterministic", async () => {
   const first = await render(spec, { theme: "paper", formats: ["svg"] });
   const second = await render(spec, { theme: "paper", formats: ["svg"] });
   assert.equal(first.svg, second.svg);
+});
+
+test("retired theme ids resolve to the replacement themes", async () => {
+  for (const [retired, replacement] of [["glass", "light"], ["midnight", "dark"]]) {
+    assert.equal(getTheme(retired), getTheme(replacement));
+    const old = await render(spec, { theme: retired, formats: ["svg"] });
+    const current = await render(spec, { theme: replacement, formats: ["svg"] });
+    assert.equal(old.svg, current.svg);
+    assert.equal(old.theme.id, replacement);
+  }
+});
+
+test("accent nodes use readable secondary text and support an override", async () => {
+  const spec = { nodes: [{ id: "accent", label: "Release", note: "Version and checksums", accent: true }] };
+  for (const { id } of listThemes()) {
+    const result = await render(spec, { theme: id, formats: ["svg"] });
+    assert.ok(result.svg.includes(`fill="${result.theme.node.accent.text.color}" text-anchor="middle" dominant-baseline="central">Version and checksums</text>`), id);
+  }
+  const custom = await render({ ...spec, style: { node: { accent: { note: { color: "#fedcba" } } } } });
+  assert.match(custom.svg, /fill="#fedcba"[^>]*>Version and checksums<\/text>/);
 });
 
 test("png rasterizes with bundled fonts", async () => {
@@ -57,7 +77,30 @@ test("all node kinds and groups render", async () => {
   const grouped = JSON.parse(readFileSync(join(here, "..", "examples", "transformer-block.json"), "utf8"));
   const groupedResult = await render(grouped, { formats: ["svg"] });
   assert.ok(groupedResult.model.zones.length === 1);
-  assert.ok(groupedResult.svg.includes("REPEATED × N"));
+  assert.ok(groupedResult.svg.includes("Repeated × N"));
+  const labelPosition = groupedResult.svg.indexOf(">Repeated × N</text>");
+  assert.ok(labelPosition > groupedResult.svg.lastIndexOf("marker-end="), "group labels paint above crossing routes");
+  assert.ok(labelPosition < groupedResult.svg.indexOf('data-node="tokens"'), "group labels stay below nodes");
+});
+
+test("multiline decision labels and notes fit inside the diamond", async () => {
+  for (const { id } of listThemes()) {
+    const result = await render({ nodes: [{ id: "decision", kind: "decision", label: "Все изменения согласованы?", note: "Дополнительная строка\nи пояснение" }] }, { theme: id });
+    const node = result.model.nodes[0];
+    const noteFont = result.theme.fonts.note;
+    const labelHeight = node.lines.length * node.labelFont.size * (node.labelFont.lineHeight ?? 1.35);
+    const noteHeight = node.noteLines.length * noteFont.size * (noteFont.lineHeight ?? 1.35);
+    let cursor = -(labelHeight + 5 + noteHeight) / 2;
+    for (const [lines, font] of [[node.lines, node.labelFont], [node.noteLines, noteFont]]) {
+      if (lines === node.noteLines) cursor += 5;
+      const lineHeight = font.size * (font.lineHeight ?? 1.35);
+      for (const line of lines) {
+        const y = Math.abs(cursor + lineHeight / 2) + lineHeight / 2;
+        assert.ok(measureText(line, font) / node.w + 2 * y / node.h < 1, `${id}: ${line} crosses the diamond`);
+        cursor += lineHeight;
+      }
+    }
+  }
 });
 
 test("ascii charset can drop unicode frame characters", async () => {

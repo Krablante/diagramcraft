@@ -11,7 +11,7 @@ import { render } from "dorpie";
 Install it from a release tarball or straight from the repository:
 
 ```sh
-npm install https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
+npm install https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
 # or, tracking main:
 npm install github:Krablante/dorpie
 ```
@@ -102,7 +102,7 @@ import { listThemes, getTheme, loadThemeFile, ThemeError } from "dorpie";
 listThemes();
 // [{ id, title, description, tags, order }, ...] sorted for display
 
-const theme = getTheme("glass");          // resolved built-in theme
+const theme = getTheme("light");          // resolved built-in theme
 const custom = loadThemeFile("./my-theme.json"); // resolved custom theme over the base defaults
 ```
 

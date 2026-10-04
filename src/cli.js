@@ -52,7 +52,7 @@ Render options:
 
 Examples:
   dorpie render diagram.json --format svg,png,ascii
-  dorpie render diagram.json --theme glass -o out/
+  dorpie render diagram.json --theme light -o out/
 `;
 
 /**

@@ -4,6 +4,15 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-10-04
+
+- Replace Glass and Midnight with restrained Light and Dark themes. The old ids still resolve to their replacements, so saved specs remain usable; archived exports keep their original files and theme snapshots.
+- Preserve Classic and Mono for standard flowcharts and monochrome print. Rework Paper with fine grain and shallow relief, Vivid with muted colour coding, and Blueprint with a quiet grid and opaque shapes.
+- Add Copper: warm charcoal grain, copper highlights, serif headings and softly raised surfaces. Eight themes now cover ordinary documents, print and expressive presentations.
+- Improve secondary text, group labels, footers and dark-theme shape fills. Accent notes follow the accent text colour, with an optional `node.accent.note.color` override.
+- Fit multiline decision labels and notes inside the actual diamond slopes; keep crossing routes from cutting through group names.
+- Refresh the English/Russian guides and gallery with a shared release workflow showing branches, a group, notes and an accent. Rendering remains local with the existing bundled fonts and dependencies.
+
 ## [0.3.1] - 2026-10-04
 
 - Restore connector labels, wrap long words at the requested width, account for letter spacing, and reserve heading rules, standalone subtitles and long footers correctly.

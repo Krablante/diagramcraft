@@ -156,6 +156,7 @@ export function renderSvg(model, theme, spec, options = {}) {
 
   // ---- zones ---------------------------------------------------------------
   const zoneFont = { ...theme.fonts.zone };
+  const zoneLabels = [];
   for (const zone of model.zones) {
     const stroke = theme.zone.stroke ?? {};
     const zoneFill = zone.color ? { type: "solid", color: zone.color } : theme.zone.fill;
@@ -169,7 +170,11 @@ export function renderSvg(model, theme, spec, options = {}) {
     const labelColor = theme.zone.labelColor ?? zoneFont.color;
     const labelX = zx + theme.zone.labelPad;
     const labelY = zy + theme.zone.labelPad;
-    layers.push(textLine(label, { ...zoneFont, color: labelColor }, labelX, labelY, "start"));
+    const labelHeight = (zoneFont.lineHeight ?? 1.35) * zoneFont.size;
+    zoneLabels.push(
+      `<rect x="${round(labelX - 3)}" y="${round(labelY - labelHeight / 2)}" width="${round(widestLine([label], zoneFont) + 6)}" height="${round(labelHeight)}" fill="${paintValue(zoneFill)}"/>`,
+      textLine(label, { ...zoneFont, color: labelColor }, labelX, labelY, "start"),
+    );
     layers.push(`</g>`);
   }
 
@@ -244,6 +249,9 @@ export function renderSvg(model, theme, spec, options = {}) {
     return `<marker id="${id}" markerUnits="userSpaceOnUse" viewBox="0 0 10 10" refX="${tip}" refY="5" markerWidth="${round(size)}" markerHeight="${round(size)}" orient="auto"><path d="M${base},0.8 L${tip},5 L${base},9.2 Z" fill="${color}"/></marker>`;
   }
 
+  // Label backgrounds keep crossing routes from cutting through group names.
+  layers.push(...zoneLabels);
+
   // edge labels above edges, below nodes
   for (const edge of model.edges) {
     if (!edge.label || !edge.labelBox) continue;
@@ -282,7 +290,7 @@ export function renderSvg(model, theme, spec, options = {}) {
     }
 
     const lineHeight = (node.labelFont.lineHeight ?? 1.35) * node.labelFont.size;
-    const noteFont = theme.fonts.note;
+    const noteFont = node.accent ? { ...theme.fonts.note, color: theme.node.accent.note?.color ?? textColor } : theme.fonts.note;
     const noteHeight = node.noteLines.length ? 5 + blockHeight(node.noteLines, noteFont) : 0;
     const totalHeight = blockHeight(node.lines, node.labelFont) + noteHeight;
     let cursor = y + (node.h - totalHeight) / 2 + (node.kind === "database" ? Math.min(11, node.h * 0.2) / 2 : 0);

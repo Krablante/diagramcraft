@@ -9,6 +9,8 @@ import { deepMerge } from "./util.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const builtinDir = join(here, "..", "themes");
+// Keep saved specs using retired theme ids renderable without cluttering listings.
+const aliases = new Map([["glass", "light"], ["midnight", "dark"]]);
 
 export class ThemeError extends Error {}
 
@@ -90,7 +92,7 @@ export function listThemes() {
  */
 export function getTheme(id) {
   init();
-  const theme = builtins.get(id);
+  const theme = builtins.get(aliases.get(id) ?? id);
   if (!theme) {
     const available = [...builtins.keys()].join(", ");
     throw new ThemeError(`unknown theme ${JSON.stringify(id)}; available themes: ${available}`);

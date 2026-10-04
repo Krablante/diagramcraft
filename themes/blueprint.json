@@ -1,57 +1,51 @@
 {
   "id": "blueprint",
   "title": "Blueprint",
-  "description": "Engineering drawing: grid paper, monospace type, thin technical lines.",
+  "description": "Technical drawings: blue grid, opaque shapes, monospace labels and open arrows.",
   "tags": ["technical", "dark", "monospace"],
-  "order": 6,
+  "order": 7,
   "canvas": {
-    "background": { "type": "solid", "color": "#0f2a4a" },
-    "texture": { "type": "grid", "color": "rgba(125,211,252,0.12)", "size": 22, "width": 1 },
-    "vignette": { "color": "#020617", "opacity": 0.32, "size": 0.85 },
-    "padding": 46,
-    "radius": 12
+    "background": { "type": "solid", "color": "#173b57" },
+    "texture": { "type": "grid", "color": "rgba(209,231,245,0.07)", "size": 24, "width": 1 }
   },
   "fonts": {
-    "title": { "family": "JetBrains Mono", "size": 24, "weight": 700, "color": "#e0f2fe", "spacing": 0.4 },
-    "subtitle": { "family": "JetBrains Mono", "size": 12.5, "weight": 400, "color": "#7dd3fc" },
-    "node": { "family": "JetBrains Mono", "size": 13, "weight": 400, "color": "#e0f2fe" },
-    "note": { "family": "JetBrains Mono", "size": 11, "weight": 400, "color": "#7dd3fc" },
-    "edge": { "family": "JetBrains Mono", "size": 10.5, "weight": 400, "color": "#bae6fd" },
-    "zone": { "family": "JetBrains Mono", "size": 10, "weight": 700, "color": "#7dd3fc", "spacing": 0.8, "uppercase": true },
-    "footer": { "family": "JetBrains Mono", "size": 10, "weight": 400, "color": "#7dd3fc" }
+    "title": { "family": "JetBrains Mono", "size": 24, "weight": 700, "color": "#f0f6fa" },
+    "subtitle": { "family": "JetBrains Mono", "size": 13, "weight": 400, "color": "#c1d8e8" },
+    "node": { "family": "JetBrains Mono", "size": 14, "weight": 400, "color": "#f0f6fa" },
+    "note": { "family": "JetBrains Mono", "size": 12, "weight": 400, "color": "#c1d8e8" },
+    "edge": { "family": "JetBrains Mono", "size": 11.5, "weight": 400, "color": "#d1e7f5" },
+    "zone": { "family": "JetBrains Mono", "size": 11.5, "weight": 700, "color": "#c1d8e8" },
+    "footer": { "family": "JetBrains Mono", "size": 11.5, "weight": 400, "color": "#c1d8e8" }
   },
   "node": {
-    "radius": 4,
-    "padX": 16,
-    "padY": 11,
-    "fill": { "type": "solid", "color": "rgba(15,42,74,0.85)" },
-    "stroke": { "color": "#cfe4ff", "width": 1.2 },
-    "shadow": null,
+    "radius": 0,
+    "fill": { "type": "solid", "color": "#173b57" },
+    "stroke": { "color": "#d1e7f5", "width": 1.3 },
     "kinds": {
-      "terminal": { "fill": { "type": "solid", "color": "rgba(8,47,73,0.9)" }, "stroke": { "color": "#7dd3fc", "width": 1.4 } },
-      "decision": { "fill": { "type": "solid", "color": "rgba(12,74,110,0.55)" } },
-      "database": { "fill": { "type": "solid", "color": "rgba(8,47,73,0.85)" } },
-      "note": { "fill": { "type": "solid", "color": "rgba(120,53,15,0.35)" }, "stroke": { "color": "rgba(251,191,36,0.8)", "width": 1, "dash": [4, 3] } },
-      "junction": { "fill": { "type": "solid", "color": "#7dd3fc" }, "stroke": { "color": "#7dd3fc", "width": 0 } }
+      "terminal": { "fill": { "type": "solid", "color": "#214b68" } },
+      "decision": { "fill": { "type": "solid", "color": "#173b57" } },
+      "data": { "fill": { "type": "solid", "color": "#173b57" } },
+      "document": { "fill": { "type": "solid", "color": "#173b57" } },
+      "database": { "fill": { "type": "solid", "color": "#173b57" } },
+      "connector": { "fill": { "type": "solid", "color": "#173b57" } },
+      "note": { "fill": { "type": "solid", "color": "#214b68" }, "stroke": { "color": "#c1d8e8", "width": 1.2, "dash": [4, 3] } },
+      "junction": { "fill": { "type": "solid", "color": "#d1e7f5" }, "stroke": { "color": "#d1e7f5", "width": 0 } }
     },
     "accent": {
-      "fill": { "type": "solid", "color": "#0ea5e9" },
-      "stroke": { "color": "#e0f2fe", "width": 1.2 },
-      "text": { "color": "#04212f" }
+      "fill": { "type": "solid", "color": "#d1e7f5" },
+      "stroke": { "color": "#d1e7f5", "width": 1.3 },
+      "text": { "color": "#173b57" }
     }
   },
   "edge": {
-    "stroke": { "color": "#9dc2ee", "width": 1.3 },
-    "cornerRadius": 9,
-    "arrow": { "type": "vee", "size": 10, "color": "#bae6fd" },
-    "label": { "fill": "#0f2a4a", "radius": 3 }
+    "stroke": { "color": "#c1d8e8", "width": 1.3 },
+    "cornerRadius": 0,
+    "arrow": { "type": "vee", "size": 10, "color": null },
+    "label": { "fill": "#173b57", "radius": 0 }
   },
   "zone": {
-    "fill": { "type": "solid", "color": "rgba(125,211,252,0.05)" },
-    "stroke": { "color": "rgba(125,211,252,0.4)", "width": 1, "dash": [5, 4] },
-    "radius": 6
-  },
-  "heading": {
-    "rule": { "color": "#38bdf8", "width": 2, "length": 64, "gap": 10 }
+    "fill": { "type": "solid", "color": "#1b415e" },
+    "stroke": { "color": "#94b4cc", "width": 1, "dash": [5, 4] },
+    "radius": 0
   }
 }

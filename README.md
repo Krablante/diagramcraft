@@ -1,14 +1,14 @@
 <h1 align="center">Dorpie</h1>
 
 <p align="center"><strong>Write JSON. Get a diagram. Reopen it next session.</strong><br>
-Seven visual themes · SVG, PNG and ASCII · CLI, Node API and OpenCode tools</p>
+Eight visual themes · SVG, PNG and ASCII · CLI, Node API and OpenCode tools</p>
 
 <p align="center">
   <a href="./README.md">English</a> · <a href="./README.ru.md">Русский</a>
 </p>
 
 <p align="center">
-  <img alt="Transformer block diagram rendered in the Glass theme" src="./docs/gallery/transformer-block.png" width="560">
+  <img alt="Release workflow rendered in the Copper theme" src="./docs/gallery/theme-copper.png" width="560">
 </p>
 
 Dorpie is a CLI, Node library and OpenCode/OpenCodez plugin that renders a JSON diagram spec into SVG, PNG and ASCII. The spec is the source of truth: you describe nodes and edges once and render every format from them, so “add one more block” stays a two-line edit instead of a redraw. Saved diagrams keep source revisions and export history across agent sessions.
@@ -20,7 +20,7 @@ Everything runs locally in Node — no headless browser, no network calls while 
 Node 20 or newer. The package ships as a tarball attached to GitHub releases:
 
 ```sh
-npm install -g https://github.com/Krablante/dorpie/releases/download/v0.3.1/dorpie-0.3.1.tgz
+npm install -g https://github.com/Krablante/dorpie/releases/download/v0.4.0/dorpie-0.4.0.tgz
 dorpie --version
 ```
 
@@ -65,7 +65,7 @@ dorpie render hello.json    # writes hello.svg, hello.png and hello.txt
 }
 ```
 
-`dorpie validate spec.json` checks a spec without rendering and reports every problem with its JSON path. CLI flags override the spec: `dorpie render spec.json --theme glass --format png --scale 2 --out out/`. The full command reference is in [docs/cli.md](./docs/cli.md).
+`dorpie validate spec.json` checks a spec without rendering and reports every problem with its JSON path. CLI flags override the spec: `dorpie render spec.json --theme light --format png --scale 2 --out out/`. The full command reference is in [docs/cli.md](./docs/cli.md).
 
 For work you want to reopen later, use `dorpie save spec.json --name "Deploy flow"`, then `dorpie export <returned-id>`. `dorpie list`, `get` and `history` find previous diagrams and their versions. CLI and plugin share one configurable library; exports keep their own files, source snapshot and theme. See [saved diagrams and configuration](./docs/library.md).
 
@@ -77,19 +77,21 @@ For work you want to reopen later, use `dorpie save spec.json --name "Deploy flo
 
 ## Themes
 
-Each theme is a complete system: fonts, line weights, node fills, arrowheads, backgrounds, textures and composition. Pick one by intent:
+Use Classic for standard flowcharts, Mono for monochrome print, and Light or Dark to match your document. Paper and Copper add fine grain and shallow shadows; Blueprint uses a restrained drawing grid. Vivid distinguishes node kinds with colour while keeping their shapes legible.
 
 | | |
 |---|---|
 | ![Classic](./docs/gallery/theme-classic.png) **Classic** — neutral flowcharts, crisp and familiar | ![Mono](./docs/gallery/theme-mono.png) **Mono** — black-and-white print, monospace |
-| ![Paper](./docs/gallery/theme-paper.png) **Paper** — warm printed page, serif, paper grain | ![Glass](./docs/gallery/theme-glass.png) **Glass** — liquid glass over colour fields |
-| ![Midnight](./docs/gallery/theme-midnight.png) **Midnight** — dark navy, soft glows | ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — colour-coded shapes, indigo accent |
-| ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — engineering grid, technical lines | ![Node shapes](./docs/gallery/node-shapes.png) **Every shape** — terminal, decision, data, document, database, connector, note, junction |
+| ![Light](./docs/gallery/theme-light.png) **Light** — soft grey canvas, white nodes, restrained blue | ![Dark](./docs/gallery/theme-dark.png) **Dark** — charcoal surfaces, clear outlines, pale blue accent |
+| ![Paper](./docs/gallery/theme-paper.png) **Paper** — ivory grain, serif labels, shallow relief | ![Copper](./docs/gallery/theme-copper.png) **Copper** — charcoal grain, warm highlights, raised surfaces |
+| ![Vivid](./docs/gallery/theme-vivid.png) **Vivid** — muted colour-coded shapes, teal accent | ![Blueprint](./docs/gallery/theme-blueprint.png) **Blueprint** — fine blue grid, technical lines, open arrows |
+
+The retired ids `glass` and `midnight` resolve to `light` and `dark`. Existing specs still render; new exports record the replacement theme. Previously saved exports retain their original files and theme snapshots. See [every node shape](./docs/gallery/node-shapes.png) and the [theme reference](./docs/themes.md).
 
 Themes are data. Start from a built-in with `dorpie themes paper > my-theme.json`, change what you need, and render with `--theme my-theme.json`. Small tweaks can stay in the spec:
 
 ```json
-{ "theme": "glass", "style": { "fonts": { "title": { "color": "#4338ca" } } } }
+{ "theme": "light", "style": { "fonts": { "title": { "color": "#305b85" } } } }
 ```
 
 [docs/themes.md](./docs/themes.md) has the full token reference and a walkthrough for writing a theme.
@@ -109,7 +111,7 @@ The whole product is built around one loop:
 import { render } from "dorpie";
 
 const { svg, png, ascii } = await render(spec, {
-  theme: "glass",                 // built-in id or path to a theme JSON
+  theme: "light",                 // built-in id or path to a theme JSON
   formats: ["svg", "png", "ascii"],
 });
 ```
@@ -122,7 +124,8 @@ The full API reference is in [docs/api.md](./docs/api.md).
 - `examples/buro-draft-workflow.json` — how a change lands in a revision-checked registry (Paper)
 - `examples/opencodez-release.json` — release flow from upstream tag to verified hosts (Vivid, with zones)
 - `examples/opencodebot-artifact.json` — how a file reaches a Telegram topic (Blueprint)
-- `examples/transformer-block.json` — a residual transformer block with junction merges (Glass)
+- `examples/transformer-block.json` — a residual transformer block with junction merges (Light)
+- `examples/theme-preview.json` — a release workflow with a group, branches, notes and an accent; shared by all theme previews
 - `examples/node-shapes.json` — every node kind in one diagram
 
 ## Documentation

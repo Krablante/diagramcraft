@@ -2,7 +2,7 @@
   "version": 1,
   "title": "Transformer block",
   "subtitle": "Residual stream with attention and feed-forward layers",
-  "theme": "glass",
+  "theme": "light",
   "direction": "TB",
   "groups": [
     { "id": "block", "label": "Repeated × N", "nodes": ["attn", "add1", "norm1", "ffn", "add2", "norm2"] }

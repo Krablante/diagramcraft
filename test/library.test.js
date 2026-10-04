@@ -61,7 +61,7 @@ test("exports keep exact source, resolved theme, options, hashes and previous fi
   assert.equal(a.options.transparent, false);
   assert.equal((await readFile(a.files.png)).subarray(1, 4).toString(), "PNG");
   const bytes = await readFile(a.files.svg);
-  assert.equal((JSON.parse(await readFile(join(a.outputDir, "theme.json"), "utf8"))).id, "glass");
+  assert.equal((JSON.parse(await readFile(join(a.outputDir, "theme.json"), "utf8"))).id, "light");
   await library.save(spec, { id: first.id, expectedRevision: 1, name: "Version 2" });
   const moved = createLibrary({ ...options, exportDir: join(dir, "different-exports") });
   const b = await moved.export(first.id, { revision: 1, formats: ["svg"], theme: "paper" });

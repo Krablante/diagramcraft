@@ -79,7 +79,9 @@ test("themes lists built-ins and prints one theme", () => {
   const listed = run(["themes", "--json"]);
   assert.equal(listed.status, 0, listed.stderr);
   const themes = JSON.parse(listed.stdout);
-  assert.ok(themes.some((theme) => theme.id === "glass"));
+  assert.ok(themes.some((theme) => theme.id === "light"));
+  assert.ok(themes.some((theme) => theme.id === "dark"));
+  assert.ok(!themes.some((theme) => theme.id === "glass" || theme.id === "midnight"));
 
   const one = run(["themes", "paper"]);
   assert.equal(one.status, 0, one.stderr);
@@ -116,7 +118,7 @@ test("programmatic API is importable from the package root", () => {
 const result = await render({ nodes: [{ id: "a", label: "A" }] }, { formats: ["svg", "ascii"] });
 console.log(listThemes().length, result.svg.length > 100, result.ascii.includes("A"));`;
   const out = execFileSync(process.execPath, ["--input-type=module", "-e", script], { encoding: "utf8" });
-  assert.equal(out.trim().split(" ").slice(0, 3).join(" "), "7 true true");
+  assert.match(out.trim(), /^\d+ true true$/);
 });
 
 test("saved CLI workflow reopens, updates, exports and reports conflicts", () => {

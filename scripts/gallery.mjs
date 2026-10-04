@@ -15,12 +15,12 @@ const readSpec = (file) => JSON.parse(readFileSync(join(root, "examples", file),
 /** @type {Array<{name:string, spec:any, theme?:string, scale?:number}>} */
 const jobs = [];
 for (const theme of listThemes()) {
-  jobs.push({ name: `theme-${theme.id}`, spec: readSpec("quickstart.json"), theme: theme.id, scale: 1 });
+  jobs.push({ name: `theme-${theme.id}`, spec: readSpec("theme-preview.json"), theme: theme.id, scale: 1 });
 }
 jobs.push(
   { name: "buro-draft-workflow", spec: readSpec("buro-draft-workflow.json"), theme: "paper", scale: 1 },
   { name: "opencodez-release", spec: readSpec("opencodez-release.json"), theme: "vivid", scale: 1 },
-  { name: "transformer-block", spec: readSpec("transformer-block.json"), theme: "glass", scale: 1 },
+  { name: "transformer-block", spec: readSpec("transformer-block.json"), theme: "light", scale: 1 },
   { name: "opencodebot-artifact", spec: readSpec("opencodebot-artifact.json"), theme: "blueprint", scale: 1 },
   { name: "node-shapes", spec: readSpec("node-shapes.json"), theme: "classic", scale: 1 },
 );
