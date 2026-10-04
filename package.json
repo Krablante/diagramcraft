@@ -47,7 +47,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test 'test/*.test.js'",
+    "test": "node --test",
     "typecheck": "tsc -p tsconfig.json",
     "check": "npm run typecheck && npm test",
     "metrics": "node scripts/build-metrics.mjs",
